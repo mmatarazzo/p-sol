@@ -26,7 +26,6 @@ public class Player {
     private ArrayList<Weapon> lasers;
     private boolean firing;
 
-    //private boolean inBounds, inBoundsX, inBoundsY;    // new
     private boolean isAlive;
     private boolean isDucked;
     private float duckDuration = .6f;
@@ -41,8 +40,6 @@ public class Player {
     // weapon
     private static final int LASER_WIDTH = 8;
     private static final int LASER_HEIGHT = 1;
-    /*private static final int LASER_SPEED = 512;
-    private static final int LASER_COLOR = Color.GREEN;*/
 
     public Player(float x, float y, int width, int height) {
         this.x = x;
@@ -53,9 +50,6 @@ public class Player {
         ground = new Rect(0, 405, 0 + 800, 405 + 45);
         rect = new Rect();
         duckRect = new Rect();
-        /*inBounds = true;    // new
-        inBoundsX = true;
-        inBoundsY = true;*/
         isAlive = true;
         isDucked = false;
 
@@ -82,22 +76,6 @@ public class Player {
             velY = 0;
         }*/
 
-        // bounce flags NOT NECESSARY
-
-        /*if (inBoundsX) {
-            if (!checkInsideLeft(x) || !checkInsideRight(x)) {
-                //velX = -velX/velX;
-                inBoundsX = false;
-            }
-        }
-
-        if (inBoundsY) {
-            if (!checkInsideTop(y) || !checkInsideBottom(y)) {
-                //velY = -velY/velY;
-                inBoundsY = false;
-            }
-        }*/
-
         nextX = x + velX * delta;
         nextY = y + velY * delta;
 
@@ -118,14 +96,6 @@ public class Player {
             velY = 0;
         } else
             y = nextY;
-
-        /*y += velY * delta;
-        x += velX * delta;*/
-
-        /*if (checkInsideLeft(x) && checkInsideRight(x))
-            inBoundsX = true;
-        if (checkInsideTop(y) && checkInsideBottom(y))
-            inBoundsY = true;*/
 
         updateRects();
         updateWeapon(delta, currentAnim, asteroids);
@@ -219,10 +189,6 @@ public class Player {
 
     // new
     public void maneuver(int dY, int dX) {
-        /*y += deltaY;
-        x += deltaX;
-        updateRects();*/
-
         // simple acceleration physics
         nextVelX = velX + dX * 2;
         nextVelY = velY + dY * 2;
@@ -231,12 +197,9 @@ public class Player {
         velX = (Math.abs(nextVelX) < MAX_VELOCITY_X) ? nextVelX : velX;
         velY = (Math.abs(nextVelY) < MAX_VELOCITY_Y) ? nextVelY : velY;
 
-        /*velY += dY*2;
-        velX += dX*2;*/
-
         // Show velocity here
-        Log.d("VelX", String.valueOf(velX));
-        Log.d("VelY", String.valueOf(velY));
+        //Log.d("VelX", String.valueOf(velX));
+        //Log.d("VelY", String.valueOf(velY));
     }
 
     public void setFiringStatus(boolean firing) {
@@ -245,10 +208,6 @@ public class Player {
 
     public boolean isGrounded() {
         return Rect.intersects(rect, ground);
-    }
-
-    public boolean checkInsideEdges() {
-        return checkInsideLeft(x) && checkInsideRight(x) && checkInsideTop(y) && checkInsideBottom(y);
     }
 
     public boolean checkInsideLeft(float checkX) {

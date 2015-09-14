@@ -12,13 +12,9 @@ public class Weapon {
 
     private float x, y;
     private int width, height, velY;
-    /*private int speed;
-    private int color;*/
     private Rect rect;
     private boolean render;
 
-    /*private static final int LASER_LENGTH = 8;
-    private static final int LASER_WIDTH = 1;*/
     private static final int LASER_SPEED = 512;
     //public static final int LASER_COLOR = Color.GREEN;
 
@@ -29,10 +25,6 @@ public class Weapon {
         this.height = height;
         this.velY = 0;
 
-        /*length = LASER_LENGTH;
-        width = LASER_WIDTH;
-        speed = LASER_SPEED;
-        color = LASER_COLOR;*/
         rect = new Rect((int) x, (int) y, (int) x + width, (int) y + height);
         render = false;
     }
@@ -106,18 +98,6 @@ public class Weapon {
                 break;
         }
     }
-
-    /*public static void setFiring(boolean firing) {
-        Weapon.firing = firing;
-    }
-
-    public static boolean getFiring() {
-        return Weapon.firing;
-    }*/
-
-    /*public int getColor() {
-        return color;
-    }*/
 
     public void setRender(boolean render) {
         this.render = render;

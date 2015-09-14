@@ -24,7 +24,7 @@ public class Assets {
     private static SoundPool soundPool;
     //public static Animation runAnim;
     public static int hitID, onJumpID, fireID, destroyID;
-    public static Bitmap welcome, block, asteroid, cloud1, cloud2, duck, grass, jump, /*run1, run2, run3,
+    public static Bitmap welcome, block, asteroid, cloud1, cloud2, earth, duck, grass, jump, /*run1, run2, run3,
             run4, run5,*/ optionsDown, options, beginDown, begin;
 
     // ship test
@@ -40,6 +40,7 @@ public class Assets {
         asteroid = loadBitmap("asteroid1.png", false);
         cloud1 = loadBitmap("cloud1.png", true);
         cloud2 = loadBitmap("cloud2.png", true);
+        earth = loadBitmap("earth-psol.png", true);
         duck = loadBitmap("duck.png", true);
         grass = loadBitmap("grass.png", false);
         jump = loadBitmap("jump.png", true);

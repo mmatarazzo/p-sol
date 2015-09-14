@@ -8,6 +8,7 @@ import android.view.MotionEvent;
 import com.example.mmataraz.framework.animation.Animation;
 import com.example.mmataraz.framework.util.Painter;
 import com.example.mmataraz.game.model.Asteroid;
+import com.example.mmataraz.game.model.Planet;
 import com.example.mmataraz.game.model.Star;
 import com.example.mmataraz.game.model.Player;
 import com.example.mmataraz.projectsol.Assets;
@@ -23,27 +24,25 @@ public class PlayState extends State {
     private Player player;
     private ArrayList<Asteroid> asteroids;
     private ArrayList<Star> stars; // new
+    private Planet earth;
     private Animation currentAnim;
 
     private int playerScore = 0;
     //private String playerScoreString;
 
     // ship - new
-    /*private static final int PLAYER_WIDTH = 66;
-    private static final int PLAYER_HEIGHT = 92;*/
-    /*private static final int PLAYER_WIDTH = 32;
-    private static final int PLAYER_HEIGHT = 32;*/
     private static final int PLAYER_SIZE = 32;
 
     // asteroid - new
-    /*private static final int ASTEROID_HEIGHT = 50;
-    private static final int ASTEROID_WIDTH = 50;*/
     private static final int ASTEROID_SIZE = 50;
     private static final int NUM_ASTEROIDS = 8;
-    //private static final int ASTEROID_SPACING = GameMainActivity.GAME_WIDTH / NUM_ASTEROIDS;
     private int asteroidSpeed = -200;
 
-    private static final int NUM_STARS = 128;
+    // stars - new
+    private static final int NUM_STARS = 96;
+
+    // planet - new
+    private static final int PLANET_SIZE = 720;
 
     // to get position deltas - new
     private float recentTouchY;
@@ -56,14 +55,15 @@ public class PlayState extends State {
 
     @Override
     public void init() {
-        /*player = new Player(160, GameMainActivity.GAME_HEIGHT - 45 -
-                PLAYER_HEIGHT, PLAYER_WIDTH, PLAYER_HEIGHT);*/
         player = new Player(256, 128, PLAYER_SIZE, PLAYER_SIZE);
 
         asteroids = new ArrayList<Asteroid>();
         stars = new ArrayList<Star>(); // new
+        earth = new Planet(0, 128);
+
         currentAnim = Assets.levelAnim;
 
+        // asteroids - new
         for (int i = 0; i < NUM_ASTEROIDS; i++) {
             Asteroid a = new Asteroid(i * 128, GameMainActivity.GAME_HEIGHT,
                     ASTEROID_SIZE, ASTEROID_SIZE);
@@ -112,6 +112,9 @@ public class PlayState extends State {
             c.update(delta);
         }
 
+        if (earth.getVisible())
+            earth.update(delta);
+
         //Assets.runAnim.update(delta);
         //Assets.shipAnim.update(delta);
         currentAnim.update(delta);
@@ -122,7 +125,6 @@ public class PlayState extends State {
     private void updateAsteroids(float delta) {
         for (int i = 0; i < asteroids.size(); i++) {
             Asteroid a = asteroids.get(i);
-        //for (Asteroid b : asteroids) {
             a.update(delta, asteroidSpeed);
 
             if (a.isVisible()) {
@@ -144,6 +146,8 @@ public class PlayState extends State {
         g.fillRect(0, 0, GameMainActivity.GAME_WIDTH, GameMainActivity.GAME_HEIGHT);
 
         renderStars(g); // new
+        if (earth.getVisible())
+            renderPlanet(g);
         renderPlayer(g);
         renderAsteroids(g);
         //renderSun(g);
@@ -200,19 +204,7 @@ public class PlayState extends State {
         }
     }
 
-    /*private void renderSun(Painter g) {
-        g.setColor(Color.rgb(255, 165, 0));
-        g.fillOval(715, -85, 170, 170);
-        g.setColor(Color.YELLOW);
-        g.fillOval(725, -75, 150, 150);
-    }
-
-    private void renderClouds(Painter g) {
-        g.drawImage(Assets.cloud1, (int) cloud1.getX(), (int) cloud1.getY(), 100, 60);
-        g.drawImage(Assets.cloud2, (int) cloud2.getX(), (int) cloud2.getY(), 100, 60);
-    }*/
-
-    // new feature, let's try STARS!!
+    // stars - new
     private void renderStars(Painter g) {
         //g.setColor(Color.rgb(255, 255, 255));
         for (int i = 0; i < stars.size(); i++) {
@@ -220,6 +212,12 @@ public class PlayState extends State {
             g.setColor(c.getColor());
             g.fillOval((int) c.getX(), (int) c.getY(), (int) c.getSize(), (int) c.getSize());
         }
+    }
+
+    private void renderPlanet(Painter g) {
+        if (earth.getVisible())
+            g.drawImage(Assets.earth, (int) earth.getX(), (int) earth.getY(),
+                    PLANET_SIZE, PLANET_SIZE);
     }
 
     @Override

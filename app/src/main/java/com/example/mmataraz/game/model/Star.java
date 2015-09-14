@@ -25,11 +25,6 @@ public class Star {
     private static final int[] STAR_COLORS = { Color.CYAN, Color.WHITE, Color.YELLOW,
             Color.MAGENTA, Color.LTGRAY };
 
-    /*public Star(float x, float y) {
-        this.x = x;
-        this.y = y;
-    }*/
-
     public Star() {
         x = RandomNumberGenerator.getRandIntBetween(4, GameMainActivity.GAME_WIDTH - 4);
         y = RandomNumberGenerator.getRandIntBetween(4, GameMainActivity.GAME_HEIGHT - 4);
