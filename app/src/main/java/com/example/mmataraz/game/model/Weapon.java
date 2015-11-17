@@ -40,7 +40,6 @@ public class Weapon {
             if (render)
                 render = false;
 
-            //x -= GameMainActivity.GAME_WIDTH + 8;
             x -= (GameMainActivity.GAME_WIDTH + width * 2);
         }
     }
@@ -49,12 +48,19 @@ public class Weapon {
         rect.set((int) x, (int) y, (int) x + width, (int) y + height);
     }
 
-    public void onCollide(Asteroid a) {
+    public void updateRectDual() {
+        this.rect.set((int) x, (int) y - 4, (int) x + width, (int) y + height + 4);
+    }
+
+    public boolean onCollide(Asteroid a) {
         if (render && a.isVisible()) {
             Assets.playSound(Assets.destroyID);
             render = false;
             a.setVisible(false);
+            return true;
         }
+
+        return false;
     }
 
     public float getX() {

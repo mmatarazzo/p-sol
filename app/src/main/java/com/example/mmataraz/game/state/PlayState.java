@@ -23,28 +23,25 @@ public class PlayState extends State {
 
     private Player player;
     private ArrayList<Asteroid> asteroids;
-    private ArrayList<Star> stars; // new
+    private ArrayList<Star> spaceDust;
+    private ArrayList<Star> stars;
     private Planet earth;
     private Animation currentAnim;
 
     private int playerScore = 0;
     //private String playerScoreString;
 
-    // ship - new
     private static final int PLAYER_SIZE = 32;
 
-    // asteroid - new
     private static final int ASTEROID_SIZE = 50;
     private static final int NUM_ASTEROIDS = 8;
     private int asteroidSpeed = -200;
 
-    // stars - new
-    private static final int NUM_STARS = 96;
+    private static final int NUM_STARS = 64;
+    private static final int NUM_SPACEDUST = 32;
 
-    // planet - new
     private static final int PLANET_SIZE = 720;
 
-    // to get position deltas - new
     private float recentTouchY;
     private float recentTouchX;
 
@@ -59,6 +56,7 @@ public class PlayState extends State {
 
         asteroids = new ArrayList<Asteroid>();
         stars = new ArrayList<Star>(); // new
+        spaceDust = new ArrayList<Star>();
         earth = new Planet(0, 128);
 
         currentAnim = Assets.levelAnim;
@@ -70,9 +68,15 @@ public class PlayState extends State {
             asteroids.add(a);
         }
 
+        // spacedust
+        for (int i = 0; i < NUM_SPACEDUST; i++) {
+            Star s = new Star(2);
+            spaceDust.add(s);
+        }
+
         // stars - new
         for (int i = 0; i < NUM_STARS; i++) {
-            Star c = new Star();
+            Star c = new Star(1);
             stars.add(c);
         }
 
@@ -97,12 +101,13 @@ public class PlayState extends State {
 
         if (!player.isAlive()) {
             Assets.stopMusic();
-            setCurrentState(new GameOverState(playerScore / 100));
+            setCurrentState(new GameOverState(playerScore /*/ 100*/));
         }
 
-        playerScore += 1;
+        //playerScore += 1;
 
-        if (playerScore % 500 == 0 && asteroidSpeed > -280) {
+        //if (playerScore % 500 == 0 && asteroidSpeed > -280) {
+        if (playerScore > 30 && asteroidSpeed > -280) {
             asteroidSpeed -= 10;
         }
 
@@ -112,13 +117,23 @@ public class PlayState extends State {
             c.update(delta);
         }
 
-        if (earth.getVisible())
+        // for spacedust
+        for (int i = 0; i < spaceDust.size(); i++) {
+            Star s = spaceDust.get(i);
+            s.update(delta);
+        }
+
+        if (earth.getVisible()) {
+            Assets.earthAnim.update(delta);
             earth.update(delta);
+        } else {
+            player.setDual(true);
+        }
 
         //Assets.runAnim.update(delta);
         //Assets.shipAnim.update(delta);
         currentAnim.update(delta);
-        player.update(delta, currentAnim, asteroids);
+        playerScore += player.update(delta, asteroids);
         updateAsteroids(delta);
     }
 
@@ -128,13 +143,16 @@ public class PlayState extends State {
             a.update(delta, asteroidSpeed);
 
             if (a.isVisible()) {
-                if (player.isDucked() && Rect.intersects(a.getRect(),
+                /*if (player.isDucked() && Rect.intersects(a.getRect(),
                         player.getDuckRect())) {
                     a.onCollide(player);
                 } else if (!player.isDucked() && Rect.intersects(a.getRect(),
                         player.getRect())) {
                     a.onCollide(player);
-                }
+                }*/
+
+                if (Rect.intersects(a.getRect(), player.getRect()))
+                    a.onCollide(player);
             }
         }
     }
@@ -148,12 +166,10 @@ public class PlayState extends State {
         renderStars(g); // new
         if (earth.getVisible())
             renderPlanet(g);
+
+        renderSpaceDust(g);
         renderPlayer(g);
         renderAsteroids(g);
-        //renderSun(g);
-        //renderClouds(g);
-
-        //g.drawImage(Assets.grass, 0, 405);
         renderScore(g);
 
         // If game is Pause, draw additional UI elements:
@@ -171,7 +187,7 @@ public class PlayState extends State {
         g.setColor(Color.LTGRAY);
 
         //playerScoreString = String.valueOf(playerScore / 100);
-        String scoreString = Integer.toString(playerScore / 100);
+        String scoreString = Integer.toString(playerScore /*/ 100*/);
         g.drawString(/*"" + playerScore / 100*/ scoreString, 20, 30);
     }
 
@@ -204,6 +220,14 @@ public class PlayState extends State {
         }
     }
 
+    private void renderSpaceDust(Painter g) {
+        for (int i = 0; i < spaceDust.size(); i++) {
+            Star s = spaceDust.get(i);
+            g.setColor(s.getColor());
+            g.fillOval((int) s.getX(), (int) s.getY(), (int) s.getSize(), (int) s.getSize());
+        }
+    }
+
     // stars - new
     private void renderStars(Painter g) {
         //g.setColor(Color.rgb(255, 255, 255));
@@ -216,8 +240,8 @@ public class PlayState extends State {
 
     private void renderPlanet(Painter g) {
         if (earth.getVisible())
-            g.drawImage(Assets.earth, (int) earth.getX(), (int) earth.getY(),
-                    PLANET_SIZE, PLANET_SIZE);
+            Assets.earthAnim.render(g, (int) earth.getX(), (int) earth.getY(),
+                    GameMainActivity.GAME_WIDTH, GameMainActivity.GAME_HEIGHT);
     }
 
     @Override

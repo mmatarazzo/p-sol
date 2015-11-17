@@ -24,17 +24,14 @@ public class Player {
     private Rect rect, duckRect, ground;
 
     private ArrayList<Weapon> lasers;
-    private boolean firing;
+    private boolean firing, dual;
 
     private boolean isAlive;
     private boolean isDucked;
     private float duckDuration = .6f;
 
-    private static final int JUMP_VELOCITY = -600;
-    //private static final int ACCEL_GRAVITY = 1800;
-
     // new
-    private static final int MAX_VELOCITY_Y = 128;
+    private static final int MAX_VELOCITY_Y = 196;
     private static final int MAX_VELOCITY_X = 256;
 
     // weapon
@@ -59,23 +56,12 @@ public class Player {
             Weapon w = new Weapon(i, y, LASER_WIDTH, LASER_HEIGHT);
             lasers.add(w);
         }
+
+        firing = false;
+        dual = false;
     }
 
-    public void update(float delta, Animation currentAnim, ArrayList<Asteroid> asteroids) {
-        /*if (duckDuration > 0 && isDucked) {
-            duckDuration -= delta;
-        } else {
-            isDucked = false;
-            duckDuration = .6f;
-        }*/
-
-        /*if (!isGrounded()) {
-            //velY += ACCEL_GRAVITY * delta;
-        } else {
-            y = 406 - height;
-            velY = 0;
-        }*/
-
+    public int update(float delta, ArrayList<Asteroid> asteroids) {
         nextX = x + velX * delta;
         nextY = y + velY * delta;
 
@@ -98,46 +84,64 @@ public class Player {
             y = nextY;
 
         updateRects();
-        updateWeapon(delta, currentAnim, asteroids);
+        return updateWeapon(delta, asteroids);
     }
 
-    private void updateWeapon(float delta, Animation currentAnim, ArrayList<Asteroid> asteroids) {
+    private int updateWeapon(float delta, ArrayList<Asteroid> asteroids) {
+        int scoreUpdate = 0;
+
         for (int i = 0; i < lasers.size(); i++) {
             Weapon w = lasers.get(i);
             w.update(delta);
 
             if (firing && !w.getRender()) {
                 if ((int) w.getX() >= /*==*/ x + width - 1 && (int) w.getX() <= x + width + 7) {
-                    if (currentAnim == Assets.levelAnim) {
+                    //if (currentAnim == Assets.levelAnim) {
+                    if (Math.abs(velY) <= 8) {
                         w.setVelY(0);
                         w.setY(y + height / 2);
-                    } else if (currentAnim == Assets.upOneAnim) {
+                    }
+                    //else if (currentAnim == Assets.upOneAnim) {
+                    else if (velY < -8 && velY >= -32) {
                         w.setVelY(-1);
                         w.setY(y + 3 * height / 8);
-                    } else if (currentAnim == Assets.upTwoAnim) {
+                    }
+                    //else if (currentAnim == Assets.upTwoAnim) {
+                    else if (velY < -32) {
                         w.setVelY(-2);
                         w.setY(y + height / 4);
-                    } else if (currentAnim == Assets.downOneAnim) {
+                    }
+                    //} else if (currentAnim == Assets.downOneAnim) {
+                    else if (velY > 8 && velY <= 32) {
                         w.setVelY(1);
                         w.setY(y + 5 * height / 8);
-                    } else if (currentAnim == Assets.downTwoAnim) {
+                    }
+                    //else if (currentAnim == Assets.downTwoAnim) {
+                    else if (velY > 32) {
                         w.setVelY(2);
                         w.setY(y + 3 * height / 4);
                     }
 
                     Assets.playSound(Assets.fireID);
-                    //w.setY(y + height / 2);
                     w.setRender(true);
                 }
             }
 
-            w.updateRect();
+            if (!dual)
+                w.updateRect();
+            else
+                w.updateRectDual();
+
             for (int j = 0; j < asteroids.size(); j++) {
                 Asteroid a = asteroids.get(j);
-                if (Rect.intersects(w.getRect(),a.getRect()))
-                    w.onCollide(a);
+                if (Rect.intersects(w.getRect(),a.getRect())) {
+                    if (w.onCollide(a))
+                        scoreUpdate++;
+                }
             }
         }
+
+        return scoreUpdate;
     }
 
     public void updateRects() {
@@ -155,12 +159,17 @@ public class Player {
 
             if (w.getRender()) {
                 g.setColor(Color.GREEN);
-                g.fillOval((int) w.getX(), (int) w.getY(), w.getWidth(), w.getHeight());
+                if (!dual) {
+                    g.fillOval((int) w.getX(), (int) w.getY(), w.getWidth(), w.getHeight());
+                } else {
+                    g.fillOval((int) w.getX(), (int) w.getY() + 4, w.getWidth(), w.getHeight());
+                    g.fillOval((int) w.getX(), (int) w.getY() - 4, w.getWidth(), w.getHeight());
+                }
             }
         }
     }
 
-    public void jump() {
+    /*public void jump() {
         if (isGrounded()) {
             Assets.playSound(Assets.onJumpID);
             isDucked = false;
@@ -169,13 +178,13 @@ public class Player {
             velY = JUMP_VELOCITY;
             updateRects();
         }
-    }
+    }*/
 
-    public void duck() {
+    /*public void duck() {
         if (isGrounded()) {
             isDucked = true;
         }
-    }
+    }*/
 
     public void pushBack(int dX) {
         x -= dX;
@@ -206,9 +215,13 @@ public class Player {
         this.firing = firing;
     }
 
-    public boolean isGrounded() {
-        return Rect.intersects(rect, ground);
+    public void setDual(boolean dual) {
+        this.dual = dual;
     }
+
+    /*public boolean isGrounded() {
+        return Rect.intersects(rect, ground);
+    }*/
 
     public boolean checkInsideLeft(float checkX) {
         return (checkX > 0);
@@ -258,16 +271,15 @@ public class Player {
         return duckRect;
     }
 
-    public Rect getGround() {
+    /*public Rect getGround() {
         return ground;
-    }
-
+    }*/
     public boolean isAlive() {
         return isAlive;
     }
 
-    public float getDuckDuration() {
+    /*public float getDuckDuration() {
         return duckDuration;
-    }
+    }*/
 
 }

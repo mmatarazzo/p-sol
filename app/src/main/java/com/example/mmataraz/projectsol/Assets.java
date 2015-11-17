@@ -31,6 +31,10 @@ public class Assets {
     public static Bitmap /*ship1, ship2, ship3,*/ level, upOne, upTwo, downOne, downTwo;
     public static Animation shipAnim, levelAnim, upOneAnim, upTwoAnim, downOneAnim, downTwoAnim;
 
+    public static Bitmap earthOne, earthTwo, earthThree, earthFour, earthFive, earthSix,
+            earthSeven, earthEight, earthNine, earthTen, earthEleven, earthTwelve;
+    public static Animation earthAnim;
+
     // music test
     private static MediaPlayer mediaPlayer;
 
@@ -90,6 +94,38 @@ public class Assets {
         upTwoAnim = new Animation(up2);
         downOneAnim = new Animation(down1);
         downTwoAnim = new Animation(down2);
+
+        loadEarthAnim();
+    }
+
+    private static void loadEarthAnim() {
+        earthOne = loadBitmap("earth/earth-one.png", true);
+        earthTwo = loadBitmap("earth/earth-two.png", true);
+        earthThree = loadBitmap("earth/earth-three.png", true);
+        earthFour = loadBitmap("earth/earth-four.png", true);
+        earthFive = loadBitmap("earth/earth-five.png", true);
+        earthSix = loadBitmap("earth/earth-six.png", true);
+        earthSeven = loadBitmap("earth/earth-seven.png", true);
+        earthEight = loadBitmap("earth/earth-eight.png", true);
+        earthNine = loadBitmap("earth/earth-nine.png", true);
+        earthTen = loadBitmap("earth/earth-ten.png", true);
+        earthEleven = loadBitmap("earth/earth-eleven.png", true);
+        earthTwelve = loadBitmap("earth/earth-twelve.png", true);
+
+        Frame e1 = new Frame(earthOne, 16.0f);
+        Frame e2 = new Frame(earthTwo, 16.0f);
+        Frame e3 = new Frame(earthThree, 16.0f);
+        Frame e4 = new Frame(earthFour, 16.0f);
+        Frame e5 = new Frame(earthFive, 16.0f);
+        Frame e6 = new Frame(earthSix, 16.0f);
+        Frame e7 = new Frame(earthSeven, 16.0f);
+        Frame e8 = new Frame(earthEight, 16.0f);
+        Frame e9 = new Frame(earthNine, 16.0f);
+        Frame e10 = new Frame(earthTen, 16.0f);
+        Frame e11 = new Frame(earthEleven, 16.0f);
+        Frame e12 = new Frame(earthTwelve, 16.0f);
+
+        earthAnim = new Animation(e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12);
     }
 
     public static void onResume() {
