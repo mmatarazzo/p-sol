@@ -5,40 +5,40 @@ import android.graphics.Color;
 import com.example.mmataraz.framework.util.RandomNumberGenerator;
 import com.example.mmataraz.projectsol.GameMainActivity;
 
-import java.util.Random;
-
 /**
  * Created by Mike on 2/15/2015.
  */
 public class Star {
 
     private float x, y;
-    private int size, speed;
-    private int color;
+    private int size, speed, color;
 
     private static final int MIN_SIZE = 1;
     private static final int MAX_SIZE = 3;
+    //private static final int BUFFER = MIN_SIZE + MAX_SIZE;
 
-    private static final int MIN_DUST_SPEED = -64;
-    private static final int MAX_DUST_SPEED = -128;
+    private static final int MAX_STAR_SPEED = 3;
+    private static final int MIN_DUST_SPEED = 64;
+    private static final int MAX_DUST_SPEED = 128;
 
-    private static final int[] STAR_COLORS = { Color.RED, Color.YELLOW, Color.CYAN, Color.MAGENTA, Color.WHITE,
-            Color.LTGRAY, Color.GRAY, Color.DKGRAY };
+    private static final int[] STAR_COLORS = { Color.RED, Color.YELLOW, Color.CYAN, Color.MAGENTA, Color.WHITE };
+    private static final int[] DUST_COLORS = { Color.LTGRAY, Color.GRAY, Color.DKGRAY };
 
     public Star(int choice) {
+        //x = RandomNumberGenerator.getRandIntBetween(4, 796);
         x = RandomNumberGenerator.getRandIntBetween(4, GameMainActivity.GAME_WIDTH - 4);
+        //y = RandomNumberGenerator.getRandIntBetween(4, 446);
         y = RandomNumberGenerator.getRandIntBetween(4, GameMainActivity.GAME_HEIGHT - 4);
-
         size = RandomNumberGenerator.getRandIntBetween(MIN_SIZE, MAX_SIZE);
 
         switch (choice) {
-            case 1:
-                speed = RandomNumberGenerator.getRandInt(3);
-                color = STAR_COLORS[RandomNumberGenerator.getRandInt(STAR_COLORS.length - 3)];
+            case 1: // star
+                speed = RandomNumberGenerator.getRandInt(MAX_STAR_SPEED);
+                color = STAR_COLORS[RandomNumberGenerator.getRandInt(STAR_COLORS.length)];
                 break;
-            case 2:
-                speed = RandomNumberGenerator.getRandIntBetween(MAX_DUST_SPEED, MIN_DUST_SPEED);
-                color = STAR_COLORS[RandomNumberGenerator.getRandIntBetween(STAR_COLORS.length - 3, STAR_COLORS.length)];
+            case 2: // spacedust
+                speed = RandomNumberGenerator.getRandIntBetween(MIN_DUST_SPEED, MAX_DUST_SPEED);
+                color = DUST_COLORS[RandomNumberGenerator.getRandInt(DUST_COLORS.length)];
                 break;
             default:
                 break;
@@ -46,15 +46,12 @@ public class Star {
     }
 
     public void update(float delta) {
-        //x += VEL_X * delta;
-        x += speed * delta;
+        x -= speed * delta;
 
-        //if (x <= -200) {
         if (x <= -4) {
             // Reset to the right
-            //x += 1000;
-            x += GameMainActivity.GAME_WIDTH + 8;
-            //y = RandomNumberGenerator.getRandIntBetween(20, 100);
+            x += (GameMainActivity.GAME_WIDTH + 4);
+            //y = RandomNumberGenerator.getRandIntBetween(4, 446);
             y = RandomNumberGenerator.getRandIntBetween(4, GameMainActivity.GAME_HEIGHT - 4);
         }
     }

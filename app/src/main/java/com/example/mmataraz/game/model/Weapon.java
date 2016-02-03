@@ -30,11 +30,14 @@ public class Weapon {
     }
 
     public void update(float delta) {
-        if (y < -1 || y > GameMainActivity.GAME_HEIGHT + 1)
-            velY = 0;
+        /*if (y < -1 || y > GameMainActivity.GAME_HEIGHT + 1)
+            velY = 0;*/
 
         y += velY * delta;
         x += LASER_SPEED * delta;
+
+        if (y < -6 || y > GameMainActivity.GAME_HEIGHT + 6)
+            velY = 0;
 
         if (x >= GameMainActivity.GAME_WIDTH /*+ 4*/) {
             if (render)
@@ -49,14 +52,16 @@ public class Weapon {
     }
 
     public void updateRectDual() {
-        this.rect.set((int) x, (int) y - 4, (int) x + width, (int) y + height + 4);
+        rect.set((int) x, (int) y - 4, (int) x + width, (int) y + height + 4);
     }
 
     public boolean onCollide(Asteroid a) {
         if (render && a.isVisible()) {
-            Assets.playSound(Assets.destroyID);
-            render = false;
+            Assets.playSound(Assets.destroyID); // for sound delay?
+            //render = false;
             a.setVisible(false);
+            render = false;
+
             return true;
         }
 
@@ -83,6 +88,7 @@ public class Weapon {
         return height;
     }
 
+    // adjustment here
     public void setVelY(int position) {
         switch (position) {
             case 0:

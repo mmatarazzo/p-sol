@@ -22,61 +22,52 @@ import java.io.InputStream;
 public class Assets {
 
     private static SoundPool soundPool;
-    //public static Animation runAnim;
     public static int hitID, onJumpID, fireID, destroyID;
-    public static Bitmap welcome, block, asteroid, cloud1, cloud2, earth, duck, grass, jump, /*run1, run2, run3,
-            run4, run5,*/ optionsDown, options, beginDown, begin;
 
-    // ship test
-    public static Bitmap /*ship1, ship2, ship3,*/ level, upOne, upTwo, downOne, downTwo;
-    public static Animation shipAnim, levelAnim, upOneAnim, upTwoAnim, downOneAnim, downTwoAnim;
+    // splash
+    public static Bitmap welcome, begin, beginDown, options, optionsDown;
 
+    // gameplay objects and background
+    public static Bitmap earth, asteroid;
     public static Bitmap earthOne, earthTwo, earthThree, earthFour, earthFive, earthSix,
             earthSeven, earthEight, earthNine, earthTen, earthEleven, earthTwelve;
-    public static Animation earthAnim;
 
-    // music test
+    // ship and weapons
+    public static Bitmap /*ship1, ship2, ship3,*/ level, upOne, upTwo, downOne, downTwo, laserItem;
+
+    // animations
+    public static Animation earthAnim;
+    public static Animation /*shipAnim,*/ levelAnim, upOneAnim, upTwoAnim, downOneAnim, downTwoAnim;
+
+    // music
     private static MediaPlayer mediaPlayer;
 
     public static void load() {
+        // splash
         welcome = loadBitmap("welcome.png", false);
-        block = loadBitmap("block.png", false);
-        asteroid = loadBitmap("asteroid1.png", false);
-        cloud1 = loadBitmap("cloud1.png", true);
-        cloud2 = loadBitmap("cloud2.png", true);
-        earth = loadBitmap("earth-psol.png", true);
-        duck = loadBitmap("duck.png", true);
-        grass = loadBitmap("grass.png", false);
-        jump = loadBitmap("jump.png", true);
-        /*run1 = loadBitmap("run_anim1.png", true);
-        run2 = loadBitmap("run_anim2.png", true);
-        run3 = loadBitmap("run_anim3.png", true);
-        run4 = loadBitmap("run_anim4.png", true);
-        run5 = loadBitmap("run_anim5.png", true);*/
-        optionsDown = loadBitmap("options_button_down.png", true);
-        options = loadBitmap("options_button.png", true);
-        beginDown = loadBitmap("begin_button_down.png", true);
         begin = loadBitmap("begin_button.png", true);
+        beginDown = loadBitmap("begin_button_down.png", true);
+        options = loadBitmap("options_button.png", true);
+        optionsDown = loadBitmap("options_button_down.png", true);
 
-        // ship test
+        // gameplay objects and background
+        earth = loadBitmap("earth-psol.png", true);
+        asteroid = loadBitmap("asteroid1.png", false);
+
+        // ship and weapons
         /*ship1 = loadBitmap("shiptest_anim1.png", true);
         ship2 = loadBitmap("shiptest_anim2.png", true);
         ship3 = loadBitmap("shiptest_anim3.png", true);*/
-
         level = loadBitmap("arwing-straight.png", true);
         upOne = loadBitmap("arwing-leftOne.png", true);
         upTwo = loadBitmap("arwing-leftTwo.png", true);
         downOne = loadBitmap("arwing-rightOne.png", true);
         downTwo = loadBitmap("arwing-rightTwo.png", true);
+        laserItem = loadBitmap("laser_big.png", true);
 
-        /*Frame f1 = new Frame(run1, .1f);
-        Frame f2 = new Frame(run2, .1f);
-        Frame f3 = new Frame(run3, .1f);
-        Frame f4 = new Frame(run4, .1f);
-        Frame f5 = new Frame(run5, .1f);
-        runAnim = new Animation(f1, f2, f3, f4, f5, f3, f2);*/
+        // animations
+        loadEarthAnim();
 
-        // ship test
         /*Frame sf1 = new Frame(ship1, .2f);
         Frame sf2 = new Frame(ship2, .2f);
         Frame sf3 = new Frame(ship3, .2f);
@@ -94,8 +85,6 @@ public class Assets {
         upTwoAnim = new Animation(up2);
         downOneAnim = new Animation(down1);
         downTwoAnim = new Animation(down2);
-
-        loadEarthAnim();
     }
 
     private static void loadEarthAnim() {

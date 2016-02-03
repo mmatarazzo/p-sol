@@ -4,9 +4,7 @@ import android.graphics.Color;
 import android.graphics.Rect;
 import android.util.Log;
 
-import com.example.mmataraz.framework.animation.Animation;
 import com.example.mmataraz.framework.util.Painter;
-import com.example.mmataraz.game.state.PlayState;
 import com.example.mmataraz.projectsol.Assets;
 import com.example.mmataraz.projectsol.GameMainActivity;
 
@@ -21,18 +19,17 @@ public class Player {
     private float x, y, nextX, nextY;
     private int width, height;
     private int velX, velY, nextVelX, nextVelY;  // new
-    private Rect rect, duckRect, ground;
+    private int shield;
+    private Rect rect;
 
     private ArrayList<Weapon> lasers;
-    private boolean firing, dual;
+    private boolean firing, dual, isAlive;
 
-    private boolean isAlive;
-    private boolean isDucked;
-    private float duckDuration = .6f;
-
-    // new
-    private static final int MAX_VELOCITY_Y = 196;
-    private static final int MAX_VELOCITY_X = 256;
+    // ship speed
+    //private static final int MAX_VELOCITY_Y = 192;    // 30 degrees
+    private static final int MAX_VELOCITY_Y = 230;  // >30 degrees of 400
+    //private static final int MAX_VELOCITY_X = 384;
+    private static final int MAX_VELOCITY_X = 400; // easier
 
     // weapon
     private static final int LASER_WIDTH = 8;
@@ -44,14 +41,11 @@ public class Player {
         this.width = width;
         this.height = height;
 
-        ground = new Rect(0, 405, 0 + 800, 405 + 45);
+        shield = 100;
         rect = new Rect();
-        duckRect = new Rect();
         isAlive = true;
-        isDucked = false;
 
         lasers = new ArrayList<Weapon>();
-
         for (int i = 0; i <= GameMainActivity.GAME_WIDTH; i += (LASER_WIDTH * 3)) {
             Weapon w = new Weapon(i, y, LASER_WIDTH, LASER_HEIGHT);
             lasers.add(w);
@@ -87,6 +81,11 @@ public class Player {
         return updateWeapon(delta, asteroids);
     }
 
+    public void updateRects() {
+        //rect.set((int) x, (int) y + 28, (int) x + (width - 8), (int) y + (height - 27));
+        rect.set((int) x, (int) y, (int) x + width, (int) y + height);
+    }
+
     private int updateWeapon(float delta, ArrayList<Asteroid> asteroids) {
         int scoreUpdate = 0;
 
@@ -94,32 +93,37 @@ public class Player {
             Weapon w = lasers.get(i);
             w.update(delta);
 
+            // needs some adjustment for laser start
             if (firing && !w.getRender()) {
                 if ((int) w.getX() >= /*==*/ x + width - 1 && (int) w.getX() <= x + width + 7) {
                     //if (currentAnim == Assets.levelAnim) {
-                    if (Math.abs(velY) <= 8) {
+                    if (Math.abs(velY) <= /*8*/ 70) {
                         w.setVelY(0);
                         w.setY(y + height / 2);
                     }
                     //else if (currentAnim == Assets.upOneAnim) {
-                    else if (velY < -8 && velY >= -32) {
+                    else if (velY < /*-8*/ -70 && velY >= /*-32*/ -145) {
                         w.setVelY(-1);
-                        w.setY(y + 3 * height / 8);
+                        //w.setY(y + 3 * height / 8);
+                        w.setY(y + height / 2 - 3); // for more accurate tan(10)
                     }
                     //else if (currentAnim == Assets.upTwoAnim) {
-                    else if (velY < -32) {
+                    else if (velY < /*-32*/ -145) {
                         w.setVelY(-2);
-                        w.setY(y + height / 4);
+                        //w.setY(y + height / 4);
+                        w.setY(y + height / 2 - 6); // for more accurate tan(20)
                     }
                     //} else if (currentAnim == Assets.downOneAnim) {
-                    else if (velY > 8 && velY <= 32) {
+                    else if (velY > /*8*/ 70 && velY <= /*32*/ 145) {
                         w.setVelY(1);
-                        w.setY(y + 5 * height / 8);
+                        //w.setY(y + 5 * height / 8);
+                        w.setY(y + height / 2 + 3); // for more accurate tan(10)
                     }
                     //else if (currentAnim == Assets.downTwoAnim) {
-                    else if (velY > 32) {
+                    else if (velY > /*32*/ 145) {
                         w.setVelY(2);
-                        w.setY(y + 3 * height / 4);
+                        //w.setY(y + 3 * height / 4);
+                        w.setY(y + height / 2 + 6); // for more accurate tan(20)
                     }
 
                     Assets.playSound(Assets.fireID);
@@ -144,19 +148,11 @@ public class Player {
         return scoreUpdate;
     }
 
-    public void updateRects() {
-        //rect.set((int) x + 10, (int) y, (int) x + (width - 20), (int) y + height);
-        //duckRect.set((int) x, (int) y + 20, (int) x + width, (int) y + 20 + (height - 20));
-
-        // new
-        //rect.set((int) x, (int) y + 28, (int) x + (width - 8), (int) y + (height - 27));
-        rect.set((int) x, (int) y, (int) x + width, (int) y + height);
-    }
-
     public void renderWeapon(Painter g) {
         for (int i = 0; i < lasers.size(); i++) {
             Weapon w = lasers.get(i);
 
+            // some adjustment needed
             if (w.getRender()) {
                 g.setColor(Color.GREEN);
                 if (!dual) {
@@ -169,29 +165,18 @@ public class Player {
         }
     }
 
-    /*public void jump() {
-        if (isGrounded()) {
-            Assets.playSound(Assets.onJumpID);
-            isDucked = false;
-            duckDuration = .6f;
-            y -= 10;
-            velY = JUMP_VELOCITY;
-            updateRects();
-        }
-    }*/
-
-    /*public void duck() {
-        if (isGrounded()) {
-            isDucked = true;
-        }
-    }*/
-
     public void pushBack(int dX) {
         x -= dX;
         Assets.playSound(Assets.hitID);
         if (x < -width / 2) {
             isAlive = false;
         }
+
+        shield -= 5;
+        if (shield < 1) {
+            isAlive = false;
+        }
+
         //rect.set((int) x, (int) y, (int) x + width, (int) y + height);
         updateRects();
     }
@@ -203,25 +188,17 @@ public class Player {
         nextVelY = velY + dY * 2;
 
         // max velocity check
-        velX = (Math.abs(nextVelX) < MAX_VELOCITY_X) ? nextVelX : velX;
-        velY = (Math.abs(nextVelY) < MAX_VELOCITY_Y) ? nextVelY : velY;
+        /*velX = (Math.abs(nextVelX) < MAX_VELOCITY_X) ? nextVelX : velX;
+        velY = (Math.abs(nextVelY) < MAX_VELOCITY_Y) ? nextVelY : velY;*/
+
+        // should just lock at max if max is exceeded
+        velX = (Math.abs(nextVelX) > MAX_VELOCITY_X) ? (nextVelX < 0 ? -MAX_VELOCITY_X : MAX_VELOCITY_X) : nextVelX;
+        velY = (Math.abs(nextVelY) > MAX_VELOCITY_Y) ? (nextVelY < 0 ? -MAX_VELOCITY_Y : MAX_VELOCITY_Y) : nextVelY;
 
         // Show velocity here
         //Log.d("VelX", String.valueOf(velX));
         //Log.d("VelY", String.valueOf(velY));
     }
-
-    public void setFiringStatus(boolean firing) {
-        this.firing = firing;
-    }
-
-    public void setDual(boolean dual) {
-        this.dual = dual;
-    }
-
-    /*public boolean isGrounded() {
-        return Rect.intersects(rect, ground);
-    }*/
 
     public boolean checkInsideLeft(float checkX) {
         return (checkX > 0);
@@ -237,10 +214,6 @@ public class Player {
 
     public boolean checkInsideBottom(float checkY) {
         return (checkY + height < GameMainActivity.GAME_HEIGHT);
-    }
-
-    public boolean isDucked() {
-        return isDucked;
     }
 
     public float getX() {
@@ -263,23 +236,28 @@ public class Player {
         return velY;
     }
 
+    public int getShield() {
+        return shield;
+    }
+
     public Rect getRect() {
         return rect;
     }
 
-    public Rect getDuckRect() {
-        return duckRect;
+    public void setFiringStatus(boolean firing) {
+        this.firing = firing;
     }
 
-    /*public Rect getGround() {
-        return ground;
-    }*/
+    public void setDual(boolean dual) {
+        this.dual = dual;
+    }
+
+    public boolean getDual() {
+        return dual;
+    }
+
     public boolean isAlive() {
         return isAlive;
     }
-
-    /*public float getDuckDuration() {
-        return duckDuration;
-    }*/
 
 }

@@ -1,5 +1,7 @@
 package com.example.mmataraz.game.model;
 
+import com.example.mmataraz.projectsol.GameMainActivity;
+
 /**
  * Created by Mike on 9/13/2015.
  */
@@ -20,7 +22,7 @@ public class Planet {
     public void update(float delta) {
         x += PLANET_SPEED * delta;
 
-        if (x < -760)
+        if (x < -GameMainActivity.GAME_WIDTH)
             visible = false;
     }
 
