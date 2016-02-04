@@ -10,17 +10,18 @@ import com.example.mmataraz.projectsol.GameMainActivity;
  */
 public class Weapon {
 
-    private float x, y;
+    private float x, y, startX;
     private int width, height, velY;
     private Rect rect;
     private boolean render;
 
     private static final int LASER_SPEED = 512;
-    //public static final int LASER_COLOR = Color.GREEN;
+    private static final int LASER_DISTANCE = 384;
 
     public Weapon(float x, float y, int width, int height) {
         this.x = x;
         this.y = y;
+        this.startX = x;
         this.width = width;
         this.height = height;
         this.velY = 0;
@@ -30,21 +31,28 @@ public class Weapon {
     }
 
     public void update(float delta) {
-        /*if (y < -1 || y > GameMainActivity.GAME_HEIGHT + 1)
-            velY = 0;*/
-
         y += velY * delta;
         x += LASER_SPEED * delta;
+
+        if (!render)
+            startX = x;
 
         if (y < -6 || y > GameMainActivity.GAME_HEIGHT + 6)
             velY = 0;
 
-        if (x >= GameMainActivity.GAME_WIDTH /*+ 4*/) {
-            if (render)
+        // to shorten laser travel distance, pick a constant
+        // and check to see if the difference between the current
+        // x and the start x exceeds the constant
+        //if (render) {
+            if (x - startX > LASER_DISTANCE || x >= GameMainActivity.GAME_WIDTH) {
+                //if (render)
                 render = false;
 
-            x -= (GameMainActivity.GAME_WIDTH + width * 2);
-        }
+                x -= (GameMainActivity.GAME_WIDTH + width * 2);
+                // maybe reset y to screen center?
+            }
+        //} else
+            //startX = x;
     }
 
     public void updateRect() {
@@ -58,7 +66,6 @@ public class Weapon {
     public boolean onCollide(Asteroid a) {
         if (render && a.isVisible()) {
             Assets.playSound(Assets.destroyID); // for sound delay?
-            //render = false;
             a.setVisible(false);
             render = false;
 
@@ -80,6 +87,10 @@ public class Weapon {
         return y;
     }
 
+    public void setStartX(float startX) {
+        this.startX = startX;
+    }
+
     public int getWidth() {
         return width;
     }
@@ -88,17 +99,17 @@ public class Weapon {
         return height;
     }
 
-    // adjustment here
+    // possible adjustment here?
     public void setVelY(int position) {
         switch (position) {
             case 0:
                 velY = 0;
                 break;
             case -1:
-                velY = -LASER_SPEED / 4;
+                velY = -LASER_SPEED / 4;    // multiply by 3/16?
                 break;
             case -2:
-                velY = -LASER_SPEED / 2;
+                velY = -LASER_SPEED / 2;    // multiply by 3/8?
                 break;
             case 1:
                 velY = LASER_SPEED / 4;
@@ -122,4 +133,5 @@ public class Weapon {
     public Rect getRect() {
         return rect;
     }
+
 }

@@ -51,7 +51,7 @@ public class Assets {
         optionsDown = loadBitmap("options_button_down.png", true);
 
         // gameplay objects and background
-        earth = loadBitmap("earth-psol.png", true);
+        earth = loadBitmap("earth-new.png", true);
         asteroid = loadBitmap("asteroid1.png", false);
 
         // ship and weapons

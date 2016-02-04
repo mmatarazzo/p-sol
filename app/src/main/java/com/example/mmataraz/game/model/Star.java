@@ -15,7 +15,6 @@ public class Star {
 
     private static final int MIN_SIZE = 1;
     private static final int MAX_SIZE = 3;
-    //private static final int BUFFER = MIN_SIZE + MAX_SIZE;
 
     private static final int MAX_STAR_SPEED = 3;
     private static final int MIN_DUST_SPEED = 64;

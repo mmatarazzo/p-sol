@@ -19,9 +19,6 @@ public class Asteroid {
     //private static final int LOWER_Y = 386;
     private static final int LOWER_Y = GameMainActivity.GAME_HEIGHT - 64;
 
-    //private static int UPPER_Y2;
-    //private static int LOWER_Y2;
-
     public Asteroid(float x, float y, int width, int height) {
         this.x = x;
         this.y = y;
@@ -32,9 +29,6 @@ public class Asteroid {
         visible = false;
 
         rect = new Rect((int) x, (int) y, (int) x + width, (int) y + height);
-
-        //UPPER_Y2 = height;
-        //LOWER_Y2 = GameMainActivity.GAME_HEIGHT - height;
     }
 
     public void update(float delta, float velX) {

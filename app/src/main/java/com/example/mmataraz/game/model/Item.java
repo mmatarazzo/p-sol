@@ -23,10 +23,7 @@ public class Item {
     private static final int MAX_START_TIME = 2048;
 
     public Item(float x, float y, int width, int height) {
-        //x = GameMainActivity.GAME_WIDTH;
         this.x = x;
-        //y = RandomNumberGenerator.getRandIntBetween(4, GameMainActivity.GAME_HEIGHT - 4);
-        //y = RandomNumberGenerator.getRandIntBetween(UPPER_Y, LOWER_Y);
         this.y = y;
 
         this.width = width;
@@ -39,8 +36,6 @@ public class Item {
     }
 
     public void update(float delta, Player p, int timer) {
-        /*if (x < -width)
-            visible = false;*/
         if (!p.getDual() && !visible && timer > startTime) {
             visible = true;
             y = RandomNumberGenerator.getRandIntBetween(UPPER_Y, LOWER_Y);
@@ -81,4 +76,5 @@ public class Item {
     public Rect getRect() {
         return rect;
     }
+
 }

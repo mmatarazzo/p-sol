@@ -95,7 +95,9 @@ public class Player {
 
             // needs some adjustment for laser start
             if (firing && !w.getRender()) {
-                if ((int) w.getX() >= /*==*/ x + width - 1 && (int) w.getX() <= x + width + 7) {
+                if ((int) w.getX() >= x + width - 1 && (int) w.getX() <= x + width + 7) {
+                    //w.setStartX(w.getX());
+
                     //if (currentAnim == Assets.levelAnim) {
                     if (Math.abs(velY) <= /*8*/ 70) {
                         w.setVelY(0);

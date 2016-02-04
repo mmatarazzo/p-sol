@@ -81,15 +81,15 @@ public class PlayState extends State {
 
         player = new Player(PLAYER_START_X, PLAYER_START_Y, PLAYER_WIDTH, PLAYER_HEIGHT);
 
-        spaceDust = new ArrayList<Star>();
         // spacedust
+        spaceDust = new ArrayList<Star>();
         for (int i = 0; i < NUM_SPACEDUST; i++) {
             Star s = new Star(SPACEDUST_CHOICE);
             spaceDust.add(s);
         }
 
+        // stars
         stars = new ArrayList<Star>();
-        // stars - new
         for (int i = 0; i < NUM_STARS; i++) {
             Star c = new Star(STAR_CHOICE);
             stars.add(c);
@@ -123,7 +123,6 @@ public class PlayState extends State {
         if (earth.getVisible()) {
             earth.update(delta);
             Assets.earthAnim.update(delta);
-            //earth.update(delta);
         }
 
         // update stars last
@@ -165,12 +164,12 @@ public class PlayState extends State {
     @Override
     public void render(Painter g) {
         //g.setColor(Color.rgb(208, 244, 247));
-        g.setColor(Color.rgb(8, 8, 32));
+        g.setColor(Color.rgb(4, 4, 16));
         g.fillRect(0, 0, GameMainActivity.GAME_WIDTH, GameMainActivity.GAME_HEIGHT);
 
         // render order
         renderStars(g);
-        if (earth.getVisible())
+        //if (earth.getVisible())
             renderPlanet(g);
         renderSpaceDust(g);
         renderPlayer(g);
@@ -203,10 +202,9 @@ public class PlayState extends State {
     // render earth
     private void renderPlanet(Painter g) {
         if (earth.getVisible()) {
-            /*Assets.earthAnim.render(g, (int) earth.getX(), (int) earth.getY(),
-                    GameMainActivity.GAME_WIDTH, GameMainActivity.GAME_HEIGHT);*/
-            Assets.earthAnim.render(g, (int) earth.getX(), (int) earth.getY());
+            g.drawImage(Assets.earth, (int) earth.getX(), (int) earth.getY());
         }
+            //Assets.earthAnim.render(g, (int) earth.getX(), (int) earth.getY());
     }
 
 
@@ -246,7 +244,7 @@ public class PlayState extends State {
         g.setColor(Color.LTGRAY);
 
         //playerScoreString = String.valueOf(playerScore / 100);
-        String scoreString = Integer.toString(playerScore /*/ 100*/);
+        String scoreString = Integer.toString(playerScore);
         g.drawString(/*"" + playerScore / 100*/ scoreString, 20, 30);
     }
 
@@ -296,6 +294,7 @@ public class PlayState extends State {
             recentTouchY = scaledY;
             recentTouchX = scaledX; // new
         } else if (e.getAction() == MotionEvent.ACTION_UP) {
+            player.setFiringStatus(false);
 
             // Resume game if paused.
             if (gamePaused) {
@@ -304,7 +303,7 @@ public class PlayState extends State {
                 return true;
             }
 
-            player.setFiringStatus(false);
+            //player.setFiringStatus(false);
         }
 
         return true;
