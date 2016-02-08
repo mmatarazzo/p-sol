@@ -16,12 +16,12 @@ public class Star {
     private static final int MIN_SIZE = 1;
     private static final int MAX_SIZE = 3;
 
-    private static final int MAX_STAR_SPEED = 3;
+    private static final int MAX_STAR_SPEED = /*3*/ 4;
     private static final int MIN_DUST_SPEED = 64;
     private static final int MAX_DUST_SPEED = 128;
 
-    private static final int[] STAR_COLORS = { Color.RED, Color.YELLOW, Color.CYAN, Color.MAGENTA, Color.WHITE };
-    private static final int[] DUST_COLORS = { Color.LTGRAY, Color.GRAY, Color.DKGRAY };
+    private static final int[] STAR_COLORS = { Color.RED, Color.YELLOW, Color.CYAN, Color.WHITE };
+    private static final int[] DUST_COLORS = { Color.LTGRAY, Color.GRAY, Color.DKGRAY, Color.BLACK };
 
     public Star(int choice) {
         //x = RandomNumberGenerator.getRandIntBetween(4, 796);

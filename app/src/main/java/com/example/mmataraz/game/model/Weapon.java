@@ -15,7 +15,7 @@ public class Weapon {
     private Rect rect;
     private boolean render;
 
-    private static final int LASER_SPEED = 512;
+    private static final int LASER_SPEED = /*512*/ 768; // pretty fast!
     private static final int LASER_DISTANCE = 384;
 
     public Weapon(float x, float y, int width, int height) {
@@ -36,23 +36,23 @@ public class Weapon {
 
         if (!render)
             startX = x;
+        else if (x - startX > LASER_DISTANCE)
+            render = false;
 
-        if (y < -6 || y > GameMainActivity.GAME_HEIGHT + 6)
+        if (y < /*-6*/-8 || y > GameMainActivity.GAME_HEIGHT + /*6*/8)
             velY = 0;
 
         // to shorten laser travel distance, pick a constant
         // and check to see if the difference between the current
         // x and the start x exceeds the constant
-        //if (render) {
-            if (x - startX > LASER_DISTANCE || x >= GameMainActivity.GAME_WIDTH) {
-                //if (render)
+        if (/*x - startX > LASER_DISTANCE ||*/ x >= GameMainActivity.GAME_WIDTH) {
+            if (render)
                 render = false;
 
-                x -= (GameMainActivity.GAME_WIDTH + width * 2);
-                // maybe reset y to screen center?
-            }
-        //} else
-            //startX = x;
+            //x -= GameMainActivity.GAME_WIDTH;
+            x -= (GameMainActivity.GAME_WIDTH + width * 2);
+            // maybe reset y to center? - probably not necessary
+        }
     }
 
     public void updateRect() {
@@ -85,10 +85,6 @@ public class Weapon {
 
     public float getY() {
         return y;
-    }
-
-    public void setStartX(float startX) {
-        this.startX = startX;
     }
 
     public int getWidth() {

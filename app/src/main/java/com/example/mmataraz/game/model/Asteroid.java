@@ -54,7 +54,7 @@ public class Asteroid {
 
     public void onCollide(Player p) {
         visible = false;
-        p.pushBack(30);
+        p.pushBack(/*30*/ 32);
     }
 
     public float getX() {

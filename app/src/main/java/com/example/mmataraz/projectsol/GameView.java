@@ -111,6 +111,10 @@ public class GameView extends SurfaceView implements Runnable {
         }
     }
 
+    /*public void onDestroy() {
+
+    }*/
+
     private void updateAndRender(long delta) {
         currentState.update(delta / 1000f);
         currentState.render(graphics);

@@ -35,11 +35,11 @@ public class Item {
         rect = new Rect((int) x, (int) y, (int) x + width, (int) y + height);
     }
 
-    public void update(float delta, Player p, int timer) {
-        if (!p.getDual() && !visible && timer > startTime) {
+    public void update(float delta/*, Player p, int timer*/) {
+        /*if (!p.getDual() && !visible && timer > startTime) {
             visible = true;
             y = RandomNumberGenerator.getRandIntBetween(UPPER_Y, LOWER_Y);
-        }
+        }*/
 
         if (visible) {
             x += ITEM_SPEED * delta;
@@ -52,6 +52,13 @@ public class Item {
 
     public void updateRect() {
         rect.set((int) x, (int) y, (int) x + width, (int) y + height);
+    }
+
+    public void checkItemAppear(boolean dual, int timer) {
+        if (!dual && !visible && timer > startTime) {
+            visible = true;
+            y = RandomNumberGenerator.getRandIntBetween(UPPER_Y, LOWER_Y);
+        }
     }
 
     public void onCollide(Player p) {

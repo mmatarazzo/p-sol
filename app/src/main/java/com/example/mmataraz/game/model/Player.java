@@ -19,7 +19,7 @@ public class Player {
     private float x, y, nextX, nextY;
     private int width, height;
     private int velX, velY, nextVelX, nextVelY;  // new
-    private int shield;
+    private int shield, energy;
     private Rect rect;
 
     private ArrayList<Weapon> lasers;
@@ -27,9 +27,11 @@ public class Player {
 
     // ship speed
     //private static final int MAX_VELOCITY_Y = 192;    // 30 degrees
-    private static final int MAX_VELOCITY_Y = 230;  // >30 degrees of 400
+    private static final int MAX_VELOCITY_Y = /*230*/ 288;  // >30 degrees of 400   // maybe 295 or 288
     //private static final int MAX_VELOCITY_X = 384;
-    private static final int MAX_VELOCITY_X = 400; // easier
+    private static final int MAX_VELOCITY_X = /*400*/ 512; // easier    // maybe 512
+
+    private static final int WEAPON_ENERGY = 20;
 
     // weapon
     private static final int LASER_WIDTH = 8;
@@ -42,6 +44,7 @@ public class Player {
         this.height = height;
 
         shield = 100;
+        energy = 800;
         rect = new Rect();
         isAlive = true;
 
@@ -78,12 +81,20 @@ public class Player {
             y = nextY;
 
         updateRects();
+        updateEnergy();
         return updateWeapon(delta, asteroids);
     }
 
     public void updateRects() {
         //rect.set((int) x, (int) y + 28, (int) x + (width - 8), (int) y + (height - 27));
         rect.set((int) x, (int) y, (int) x + width, (int) y + height);
+    }
+
+    private void updateEnergy() {
+        if (energy < WEAPON_ENERGY)
+            energy = 800;
+        if (energy < 800)
+            energy++;
     }
 
     private int updateWeapon(float delta, ArrayList<Asteroid> asteroids) {
@@ -93,10 +104,11 @@ public class Player {
             Weapon w = lasers.get(i);
             w.update(delta);
 
-            // needs some adjustment for laser start
-            if (firing && !w.getRender()) {
+            // update rects must go after the next section because yPos is changing
+
+            // LASER START - needs some adjustment?
+            if (energy >= WEAPON_ENERGY && firing && !w.getRender()) {
                 if ((int) w.getX() >= x + width - 1 && (int) w.getX() <= x + width + 7) {
-                    //w.setStartX(w.getX());
 
                     //if (currentAnim == Assets.levelAnim) {
                     if (Math.abs(velY) <= /*8*/ 70) {
@@ -128,8 +140,9 @@ public class Player {
                         w.setY(y + height / 2 + 6); // for more accurate tan(20)
                     }
 
-                    Assets.playSound(Assets.fireID);
+                    Assets.playSound(Assets.fireID);    // lol, maybe swap?
                     w.setRender(true);
+                    energy -= WEAPON_ENERGY;
                 }
             }
 
@@ -186,10 +199,10 @@ public class Player {
     // new
     public void maneuver(int dY, int dX) {
         // simple acceleration physics
-        nextVelX = velX + dX * 2;
-        nextVelY = velY + dY * 2;
+        nextVelX = velX + dX * /*2*/ 3; // try 3 for more sensitive movement?
+        nextVelY = velY + dY * /*2*/ 3;
 
-        // max velocity check
+        // old max velocity check
         /*velX = (Math.abs(nextVelX) < MAX_VELOCITY_X) ? nextVelX : velX;
         velY = (Math.abs(nextVelY) < MAX_VELOCITY_Y) ? nextVelY : velY;*/
 
@@ -240,6 +253,10 @@ public class Player {
 
     public int getShield() {
         return shield;
+    }
+
+    public int getEnergy() {
+        return energy;
     }
 
     public Rect getRect() {

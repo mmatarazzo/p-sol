@@ -40,7 +40,7 @@ public class PlayState extends State {
     private static final int ITEM_HEIGHT = Assets.laserItem.getHeight();
 
     private static final int PLANET_START_X = 16;
-    private static final int PLANET_START_Y = 96;
+    private static final int PLANET_START_Y = /*96*/ -159;
     //private static final int PLANET_SIZE = 720;
 
     private static final int PLAYER_START_X = 256;
@@ -138,15 +138,25 @@ public class PlayState extends State {
             asteroidSpeed -= 10;
         }
 
-        dualLaser.update(delta, player, timer);
+        updateDualLaser(delta);
+        /*dualLaser.update(delta, player, timer);
         if (dualLaser.isVisible())
             if (Rect.intersects(dualLaser.getRect(), player.getRect()))
-                dualLaser.onCollide(player);
+                dualLaser.onCollide(player);*/
 
         updateAsteroids(delta);
 
         if (++timer > 60000)
             timer = 0;
+    }
+
+    private void updateDualLaser(float delta) {
+        dualLaser.checkItemAppear(player.getDual(), timer);
+
+        dualLaser.update(delta/*, player, timer*/);
+        if (dualLaser.isVisible())
+            if (Rect.intersects(dualLaser.getRect(), player.getRect()))
+                dualLaser.onCollide(player);
     }
 
     private void updateAsteroids(float delta) {
@@ -169,15 +179,14 @@ public class PlayState extends State {
 
         // render order
         renderStars(g);
-        //if (earth.getVisible())
-            renderPlanet(g);
+        renderPlanet(g);
         renderSpaceDust(g);
         renderPlayer(g);
         renderAsteroids(g);
         renderItems(g);
         renderScore(g);
-
         renderShield(g);
+        renderEnergy(g);
 
         // If game is Pause, draw additional UI elements:
         if (gamePaused) {
@@ -203,8 +212,8 @@ public class PlayState extends State {
     private void renderPlanet(Painter g) {
         if (earth.getVisible()) {
             g.drawImage(Assets.earth, (int) earth.getX(), (int) earth.getY());
-        }
             //Assets.earthAnim.render(g, (int) earth.getX(), (int) earth.getY());
+        }
     }
 
 
@@ -240,20 +249,42 @@ public class PlayState extends State {
     }
 
     private void renderScore(Painter g) {
-        g.setFont(Typeface.SANS_SERIF, 20);
-        g.setColor(Color.LTGRAY);
+        g.setFont(Typeface.DEFAULT_BOLD, 18);
+        g.setColor(Color.WHITE);
 
         //playerScoreString = String.valueOf(playerScore / 100);
         String scoreString = Integer.toString(playerScore);
-        g.drawString(/*"" + playerScore / 100*/ scoreString, 20, 30);
+        g.drawString("SCORE: ", 30, 30);
+        g.drawString(/*"" + playerScore / 100*/ scoreString, 100, 30);
     }
 
     private void renderShield(Painter g) {
-        g.setFont(Typeface.SANS_SERIF, 20);
-        g.setColor(Color.RED);
+        g.setFont(Typeface.DEFAULT_BOLD, 18);
+        g.setColor(Color.CYAN);
 
-        g.drawString("SHIELD: ", 150, 30);
-        g.fillRect(230, 15, player.getShield(), 15);
+        g.drawString("SHIELD: ", 200, 30);
+        g.fillRect(280, 15, player.getShield(), 15);
+
+        g.setColor(Color.WHITE);
+        g.fillRect(280, 15, 100, 1);
+        g.fillRect(280, 30, 100, 1);
+        g.fillRect(280, 15, 1, 15);
+        g.fillRect(380, 15, 1, 15);
+    }
+
+    private void renderEnergy(Painter g) {
+        g.setFont(Typeface.DEFAULT_BOLD, 18);
+        g.setColor(Color.GREEN);
+
+        g.drawString("ENERGY: ", 430, 30);
+        if (player.getEnergy() > 0)
+            g.fillRect(510, 15, player.getEnergy()/8, 15);
+
+        g.setColor(Color.WHITE);
+        g.fillRect(510, 15, 100, 1);
+        g.fillRect(510, 30, 100, 1);
+        g.fillRect(510, 15, 1, 15);
+        g.fillRect(610, 15, 1, 15);
     }
 
     @Override
@@ -262,6 +293,10 @@ public class PlayState extends State {
         //Log.d("Var", String.valueOf(scaledY));
 
         if (e.getAction() == MotionEvent.ACTION_DOWN) {
+            // return if pause?
+            if (gamePaused)
+                return true;
+
             //Log.d("Var", String.valueOf(recentTouchY));
 
             recentTouchY = scaledY;
@@ -269,6 +304,10 @@ public class PlayState extends State {
 
             player.setFiringStatus(true);
         } else if (e.getAction() == MotionEvent.ACTION_MOVE) {
+            // return if pause?
+            if (gamePaused)
+                return true;
+
             // to add some simple acceleration physics, use delta values
             // to change velocity, not just position..
             int deltaY = scaledY - (int) recentTouchY;
@@ -294,16 +333,16 @@ public class PlayState extends State {
             recentTouchY = scaledY;
             recentTouchX = scaledX; // new
         } else if (e.getAction() == MotionEvent.ACTION_UP) {
-            player.setFiringStatus(false);
+            //player.setFiringStatus(false);
 
             // Resume game if paused.
             if (gamePaused) {
                 gamePaused = false;
                 Assets.resumeMusic();
-                return true;
+                //return true;    // not needed
             }
 
-            //player.setFiringStatus(false);
+            player.setFiringStatus(false);
         }
 
         return true;
