@@ -108,7 +108,7 @@ public class Player {
 
             // LASER START - needs some adjustment?
             if (energy >= WEAPON_ENERGY && firing && !w.getRender()) {
-                if ((int) w.getX() >= x + width - 1 && (int) w.getX() <= x + width + 7) {
+                if ((int) w.getX() >= x + width - 1 && (int) w.getX() <= x + width + /*7*/ 11) {
 
                     //if (currentAnim == Assets.levelAnim) {
                     if (Math.abs(velY) <= /*8*/ 70) {

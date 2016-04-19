@@ -39,9 +39,9 @@ public class PlayState extends State {
     private static final int ITEM_WIDTH = Assets.laserItem.getWidth();
     private static final int ITEM_HEIGHT = Assets.laserItem.getHeight();
 
-    private static final int PLANET_START_X = 16;
-    private static final int PLANET_START_Y = /*96*/ -159;
-    //private static final int PLANET_SIZE = 720;
+    private static final int PLANET_START_X = GameMainActivity.GAME_WIDTH / 50;
+    private static final int PLANET_START_Y = /*96*/ /*-159*/
+            (GameMainActivity.GAME_HEIGHT / 2) - (Assets.earth.getHeight() / 2);  // center the planet
 
     private static final int PLAYER_START_X = 256;
     private static final int PLAYER_START_Y = 128;
@@ -59,6 +59,10 @@ public class PlayState extends State {
     private float recentTouchX;
 
     private int timer = 0;
+
+    /*private int musicSliderPosX = 0;
+    private int fxSliderPosX = 200;
+    private boolean sliderTouch = false;*/
 
     // Boolean to keep track of game pauses.
     private boolean gamePaused = false;
@@ -98,7 +102,8 @@ public class PlayState extends State {
         currentAnim = Assets.levelAnim;
 
         //Assets.playMusic("Polfix.mid", true);
-        Assets.playMusic("Bosstheme.MID", true);
+        //Assets.playMusic("Bosstheme.MID", true);
+        Assets.playMusic("earth-projsol-15.wav", true);
     }
 
     @Override
@@ -110,7 +115,7 @@ public class PlayState extends State {
 
         if (!player.isAlive()) {
             Assets.stopMusic();
-            setCurrentState(new GameOverState(playerScore /*/ 100*/));
+            setCurrentState(new GameOverState(playerScore));
         }
 
         // update spacedust
@@ -148,6 +153,8 @@ public class PlayState extends State {
 
         if (++timer > 60000)
             timer = 0;
+
+        //Assets.updateVolumes(fxSliderPosX);
     }
 
     private void updateDualLaser(float delta) {
@@ -173,7 +180,6 @@ public class PlayState extends State {
 
     @Override
     public void render(Painter g) {
-        //g.setColor(Color.rgb(208, 244, 247));
         g.setColor(Color.rgb(4, 4, 16));
         g.fillRect(0, 0, GameMainActivity.GAME_WIDTH, GameMainActivity.GAME_HEIGHT);
 
@@ -186,12 +192,14 @@ public class PlayState extends State {
         renderItems(g);
         renderScore(g);
         renderShield(g);
-        renderEnergy(g);
+        //renderEnergy(g);
+
+        //renderSliders(g);   // new
 
         // If game is Pause, draw additional UI elements:
         if (gamePaused) {
             // ARGB is used to set an ARGB color.
-            g.setColor(Color.argb(153, 0, 0, 0));
+            g.setColor(Color.argb(160, 0, 0, 0));
             g.fillRect(0, 0, GameMainActivity.GAME_WIDTH, GameMainActivity.GAME_HEIGHT);
             g.setColor(Color.LTGRAY);
             g.drawString(pausedString, 235, 240);
@@ -200,7 +208,6 @@ public class PlayState extends State {
 
     // render stars
     private void renderStars(Painter g) {
-        //g.setColor(Color.rgb(255, 255, 255));
         for (int i = 0; i < stars.size(); i++) {
             Star c = stars.get(i);
             g.setColor(c.getColor());
@@ -252,15 +259,15 @@ public class PlayState extends State {
         g.setFont(Typeface.DEFAULT_BOLD, 18);
         g.setColor(Color.WHITE);
 
-        //playerScoreString = String.valueOf(playerScore / 100);
+        //playerScoreString = String.valueOf(playerScore);
         String scoreString = Integer.toString(playerScore);
         g.drawString("SCORE: ", 30, 30);
-        g.drawString(/*"" + playerScore / 100*/ scoreString, 100, 30);
+        g.drawString(scoreString, 100, 30);
     }
 
     private void renderShield(Painter g) {
         g.setFont(Typeface.DEFAULT_BOLD, 18);
-        g.setColor(Color.CYAN);
+        g.setColor(/*Color.CYAN*/ Color.BLUE);
 
         g.drawString("SHIELD: ", 200, 30);
         g.fillRect(280, 15, player.getShield(), 15);
@@ -287,6 +294,13 @@ public class PlayState extends State {
         g.fillRect(610, 15, 1, 15);
     }
 
+    /*private void renderSliders(Painter g) {
+        g.setColor(Color.WHITE);
+
+        g.fillRect(50, 400, 200, 10);
+        g.fillOval(fxSliderPosX-25, 385, 40, 40);
+    }*/
+
     @Override
     public boolean onTouch(MotionEvent e, int scaledX, int scaledY) {
         //Log.d("Var", String.valueOf(recentTouchY));
@@ -299,10 +313,19 @@ public class PlayState extends State {
 
             //Log.d("Var", String.valueOf(recentTouchY));
 
+            /*if (Math.abs(scaledX - fxSliderPosX) < 20 && Math.abs(scaledY - 405) < 20) {
+                sliderTouch = true;
+            }*/
+            // check if slider was touched
+            // if so, set a flag saying slider was touched
+            // or do if statement
+
             recentTouchY = scaledY;
             recentTouchX = scaledX; // new
 
-            player.setFiringStatus(true);
+            /*if (!sliderTouch)*/
+                player.setFiringStatus(true);
+
         } else if (e.getAction() == MotionEvent.ACTION_MOVE) {
             // return if pause?
             if (gamePaused)
@@ -313,36 +336,47 @@ public class PlayState extends State {
             int deltaY = scaledY - (int) recentTouchY;
             int deltaX = scaledX - (int) recentTouchX;
 
-            player.maneuver(deltaY, deltaX);
+            //if (!sliderTouch) {
+                player.maneuver(deltaY, deltaX);
 
-            // here is where you would determine which direction
-            // the movement was in, and then load the appropriate animation
+                // here is where you would determine which direction
+                // the movement was in, and then load the appropriate animation
 
-            // change values according to angle
-            if (Math.abs(player.getVelY()) <= /*8*/ 70)
-                currentAnim = Assets.levelAnim;
-            else if (player.getVelY() > /*8*/ 70 && player.getVelY() <= /*32*/ 145)
-                currentAnim = Assets.downOneAnim;
-            else if (player.getVelY() > /*32*/ 145)
-                currentAnim = Assets.downTwoAnim;
-            else if (player.getVelY() < /*-8*/ -70 && player.getVelY() >= /*-32*/ -145)
-                currentAnim = Assets.upOneAnim;
-            else if (player.getVelY() < /*-32*/ -145)
-                currentAnim = Assets.upTwoAnim;
+                // change values according to angle
+                if (Math.abs(player.getVelY()) <= /*8*/ 70)
+                    currentAnim = Assets.levelAnim;
+                else if (player.getVelY() > /*8*/ 70 && player.getVelY() <= /*32*/ 145)
+                    currentAnim = Assets.downOneAnim;
+                else if (player.getVelY() > /*32*/ 145)
+                    currentAnim = Assets.downTwoAnim;
+                else if (player.getVelY() < /*-8*/ -70 && player.getVelY() >= /*-32*/ -145)
+                    currentAnim = Assets.upOneAnim;
+                else if (player.getVelY() < /*-32*/ -145)
+                    currentAnim = Assets.upTwoAnim;
+            //} else {
+                //fxSliderPosX += deltaX;
+                /*int nextSliderPos = fxSliderPosX + deltaX;
+
+                fxSliderPosX = nextSliderPos < 50 ? 50 : nextSliderPos;
+                fxSliderPosX = nextSliderPos > 250 ? 250 : nextSliderPos;*/
+            //}
 
             recentTouchY = scaledY;
             recentTouchX = scaledX; // new
         } else if (e.getAction() == MotionEvent.ACTION_UP) {
-            //player.setFiringStatus(false);
-
             // Resume game if paused.
             if (gamePaused) {
                 gamePaused = false;
-                Assets.resumeMusic();
+                //Assets.resumeMusic();
+                //Assets.playMusic("Bosstheme.MID", true);
+                Assets.playMusic("earth-projsol-15.wav", true);
                 //return true;    // not needed
             }
 
-            player.setFiringStatus(false);
+            //if (!sliderTouch)
+                player.setFiringStatus(false);
+            //else
+                //sliderTouch = false;
         }
 
         return true;
@@ -352,7 +386,8 @@ public class PlayState extends State {
     // Called when Activity is pausing.
     @Override
     public void onPause() {
-        Assets.pauseMusic();
+        //Assets.pauseMusic();
+        Assets.stopMusic();     // call stop music instead
         gamePaused = true;
     }
 }

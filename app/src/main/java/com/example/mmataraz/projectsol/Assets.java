@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory.Options;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
+import android.util.Log;
 
 import com.example.mmataraz.framework.animation.Animation;
 import com.example.mmataraz.framework.animation.Frame;
@@ -22,7 +23,7 @@ import java.io.InputStream;
 public class Assets {
 
     private static SoundPool soundPool;
-    public static int hitID, onJumpID, fireID, destroyID;
+    public static int hitID, /*onJumpID,*/ fireID, destroyID;
 
     // splash
     public static Bitmap welcome, begin, beginDown, options, optionsDown;
@@ -39,8 +40,12 @@ public class Assets {
     public static Animation earthAnim;
     public static Animation /*shipAnim,*/ levelAnim, upOneAnim, upTwoAnim, downOneAnim, downTwoAnim;
 
+    // sound
+    private static float fxVolume = 50.0f;
+
     // music
     private static MediaPlayer mediaPlayer;
+    private static int mediaPosition = 0;
 
     public static void load() {
         // splash
@@ -119,10 +124,10 @@ public class Assets {
 
     public static void onResume() {
         hitID = loadSound("hit.wav");
-        onJumpID = loadSound("onjump.wav");
+        //onJumpID = loadSound("onjump.wav");
         fireID = loadSound("laser2.wav");
         destroyID = loadSound("explode.wav");
-        //playMusic("Polfix.mid", true);
+        //playMusic("Polfix.mid", true);    // don't play music until game is actually unpaused
     }
 
     public static void onPause() {
@@ -130,6 +135,8 @@ public class Assets {
             soundPool.release();
             soundPool = null;
         }
+
+        // maybe pause music goes here?
 
         /*if (mediaPlayer != null) {
             mediaPlayer.stop();
@@ -173,7 +180,7 @@ public class Assets {
 
     public static void playSound(int soundID) {
         if (soundPool != null) {
-            soundPool.play(soundID, 1, 1, 1, 0, 1);
+            soundPool.play(soundID, fxVolume, fxVolume, 1, 0, 1);
         }
     }
 
@@ -188,6 +195,10 @@ public class Assets {
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             mediaPlayer.prepare();
             mediaPlayer.setLooping(looping);
+
+            // if music was stopped previously, return to last location
+            mediaPlayer.seekTo(mediaPosition);  // test
+
             mediaPlayer.start();
         } catch (Exception e) {
             e.printStackTrace();
@@ -208,10 +219,22 @@ public class Assets {
 
     public static void stopMusic() {
         if (mediaPlayer != null) {
+
+            // just call stop music, save the position, and release resources
+            mediaPosition = mediaPlayer.getCurrentPosition();   // test
+
             mediaPlayer.stop();
             mediaPlayer.release();
             mediaPlayer = null;
         }
     }
 
+    public static void updateVolumes(int vol) {
+        fxVolume = (vol - 50) / 200.0f;
+
+        /*fxVolume = ((vol - 100) / 200.0f) < 0.0f ? 0.0f : ((vol - 100) / 200.0f);
+        fxVolume = ((vol - 100) / 200.0f) > 1.0f ? 1.0f : ((vol - 100) / 200.0f);*/
+
+        Log.d("Volume", Float.toString(fxVolume));
+    }
 }
