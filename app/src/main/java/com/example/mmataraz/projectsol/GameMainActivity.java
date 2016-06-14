@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.res.AssetManager;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.WindowManager;
 
@@ -22,9 +23,17 @@ public class GameMainActivity extends Activity {
     private static final String highScoreKey = "highScoreKey";
     private static int highScore;
 
+    // resolution testing
+    public static int gameWidth;
+    public static int gameHeight;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        gameWidth = getResources().getDisplayMetrics().widthPixels;
+        gameHeight = getResources().getDisplayMetrics().heightPixels;
+
         prefs = getPreferences(Activity.MODE_PRIVATE);
         highScore = retrieveHighScore();
         assets = getAssets();
