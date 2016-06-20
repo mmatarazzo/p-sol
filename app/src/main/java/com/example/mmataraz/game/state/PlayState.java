@@ -24,7 +24,7 @@ public class PlayState extends State {
 
     private ArrayList<Asteroid> asteroids;
     private Item dualLaser;
-    private Planet earth;
+    private Planet earth, mars;
     private Player player;
     private ArrayList<Star> spaceDust;
     private ArrayList<Star> stars;
@@ -71,6 +71,7 @@ public class PlayState extends State {
 
     @Override
     public void init() {
+        // asteroids
         asteroids = new ArrayList<Asteroid>();
         for (int i = 0; i < NUM_ASTEROIDS; i++) {
             Asteroid a = new Asteroid((float) i * ASTEROID_SPACING, (float) GameMainActivity.GAME_HEIGHT,
@@ -78,10 +79,13 @@ public class PlayState extends State {
             asteroids.add(a);
         }
 
+        // dual laser item
         dualLaser = new Item((float) GameMainActivity.GAME_WIDTH, (float) GameMainActivity.GAME_HEIGHT,
                 ITEM_WIDTH, ITEM_HEIGHT);
 
+        // planet
         earth = new Planet(PLANET_START_X, PLANET_START_Y);
+        mars = new Planet(PLANET_START_X, PLANET_START_Y);
 
         player = new Player(PLAYER_START_X, PLAYER_START_Y, PLAYER_WIDTH, PLAYER_HEIGHT);
 
@@ -99,11 +103,27 @@ public class PlayState extends State {
             stars.add(c);
         }
 
+        // animation
         currentAnim = Assets.levelAnim;
 
-        //Assets.playMusic("Polfix.mid", true);
-        //Assets.playMusic("Bosstheme.MID", true);
-        Assets.playMusic("earth-projsol-15.wav", true);
+        // music
+        Assets.resetMusic();
+        selectMusic();
+    }
+
+    private void selectMusic() {
+        switch (currentLevel) {
+            case EARTH:
+                Assets.playMusic("earth-projsol-21.wav", true);
+                break;
+
+            case MARS:
+                Assets.playMusic("mars-projsol-05.wav", true);
+                break;
+
+            default:
+                break;
+        }
     }
 
     @Override
@@ -128,6 +148,12 @@ public class PlayState extends State {
         if (earth.getVisible()) {
             earth.update(delta);
             Assets.earthAnim.update(delta);
+        }
+
+        // update earth next
+        if (mars.getVisible()) {
+            mars.update(delta);
+            //Assets.earthAnim.update(delta);
         }
 
         // update stars last
@@ -217,9 +243,15 @@ public class PlayState extends State {
 
     // render earth
     private void renderPlanet(Painter g) {
-        if (earth.getVisible()) {
-            g.drawImage(Assets.earth, (int) earth.getX(), (int) earth.getY());
-            //Assets.earthAnim.render(g, (int) earth.getX(), (int) earth.getY());
+        if (currentLevel == PlayStateLevel.EARTH) {
+            if (earth.getVisible()) {
+                g.drawImage(Assets.earth, (int) earth.getX(), (int) earth.getY());
+                //Assets.earthAnim.render(g, (int) earth.getX(), (int) earth.getY());
+            }
+        } else if (currentLevel == PlayStateLevel.MARS) {
+            if (mars.getVisible()) {
+                g.drawImage(Assets.mars, (int) mars.getX(), (int) mars.getY());
+            }
         }
     }
 
@@ -367,10 +399,7 @@ public class PlayState extends State {
             // Resume game if paused.
             if (gamePaused) {
                 gamePaused = false;
-                //Assets.resumeMusic();
-                //Assets.playMusic("Bosstheme.MID", true);
-                Assets.playMusic("earth-projsol-15.wav", true);
-                //return true;    // not needed
+                selectMusic();
             }
 
             //if (!sliderTouch)
@@ -386,8 +415,8 @@ public class PlayState extends State {
     // Called when Activity is pausing.
     @Override
     public void onPause() {
-        //Assets.pauseMusic();
         Assets.stopMusic();     // call stop music instead
         gamePaused = true;
     }
+
 }

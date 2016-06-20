@@ -27,7 +27,7 @@ public class ScoreState extends State {
 
     @Override
     public void init() {
-
+        fxSliderPosX = 50 + ((int)Assets.getFxVolume() * 200);
     }
 
     @Override
@@ -80,5 +80,11 @@ public class ScoreState extends State {
 
         return true;
     }
+
+    @Override
+    public void onPause() {}
+
+    @Override
+    public void onResume() {}
 
 }

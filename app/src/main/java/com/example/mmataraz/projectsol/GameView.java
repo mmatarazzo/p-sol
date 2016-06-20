@@ -10,7 +10,7 @@ import android.view.SurfaceView;
 
 import com.example.mmataraz.framework.util.InputHandler;
 import com.example.mmataraz.framework.util.Painter;
-import com.example.mmataraz.game.state.LoadState;
+import com.example.mmataraz.game.state.LoadMenuState;
 import com.example.mmataraz.game.state.State;
 
 /**
@@ -45,7 +45,7 @@ public class GameView extends SurfaceView implements Runnable {
                 Log.d("GameView", "Surface Created");
                 initInput();
                 if (currentState == null) {
-                    setCurrentState(new LoadState());
+                    setCurrentState(new LoadMenuState());
                 }
                 initGame();
             }
@@ -111,10 +111,6 @@ public class GameView extends SurfaceView implements Runnable {
         }
     }
 
-    /*public void onDestroy() {
-
-    }*/
-
     private void updateAndRender(long delta) {
         currentState.update(delta / 1000f);
         currentState.render(graphics);
@@ -139,6 +135,7 @@ public class GameView extends SurfaceView implements Runnable {
             long beforeUpdateRender = System.nanoTime();
             long deltaMillis = sleepDurationMillis + updateDurationMillis;
             updateAndRender(deltaMillis);
+
             updateDurationMillis = (System.nanoTime() - beforeUpdateRender) / 1000000L;
             sleepDurationMillis = Math.max(2, 17 - updateDurationMillis);
 

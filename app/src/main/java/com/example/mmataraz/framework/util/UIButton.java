@@ -19,6 +19,9 @@ public class UIButton {
         this.buttonDownImage = buttonPressedImage;
     }
 
+    // maybe another constructor without the button pressed - Vichy97
+
+    // maybe add button pressed check - Vichy97
     public void render(Painter g) {
         Bitmap currentButtonImage = buttonDown ? buttonDownImage : buttonImage;
         g.drawImage(currentButtonImage, buttonRect.left, buttonRect.top,

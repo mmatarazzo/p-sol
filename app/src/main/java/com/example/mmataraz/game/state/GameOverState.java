@@ -5,6 +5,7 @@ import android.graphics.Typeface;
 import android.view.MotionEvent;
 
 import com.example.mmataraz.framework.util.Painter;
+import com.example.mmataraz.projectsol.Assets;
 import com.example.mmataraz.projectsol.GameMainActivity;
 
 /**
@@ -25,7 +26,7 @@ public class GameOverState extends State {
 
     @Override
     public void init() {
-
+        unload();
     }
 
     @Override
@@ -47,10 +48,29 @@ public class GameOverState extends State {
     @Override
     public boolean onTouch(MotionEvent e, int scaledX, int scaledY) {
         if (e.getAction() == MotionEvent.ACTION_UP) {
-            setCurrentState(new MenuState());
+            setCurrentState(new LoadMenuState());
         }
 
         return true;
     }
 
+    @Override
+    public void onPause() {
+
+    }
+
+    @Override
+    public void onResume() {
+
+    }
+
+    @Override
+    public void load() {
+
+    }
+
+    @Override
+    public void unload() {
+        Assets.unloadPlayAssets();
+    }
 }

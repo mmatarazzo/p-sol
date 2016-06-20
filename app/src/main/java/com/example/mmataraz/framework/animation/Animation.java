@@ -7,6 +7,8 @@ import com.example.mmataraz.framework.util.Painter;
  */
 public class Animation {
 
+    // eventually add looping feature - Vichy97
+
     private Frame[] frames;
     private double[] frameEndTimes;
     private int currentFrameIndex = 0;

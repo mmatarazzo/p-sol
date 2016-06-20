@@ -45,6 +45,20 @@ public class Painter {
         canvas.drawRect(dstRect, paint);
     }
 
+    // maybe add fillRect with param Rect - Vichy97
+
+    // maybe add 2 draw rects - Vichy97
+
+    public void fillOval(int x, int y, int width, int height) {
+        paint.setStyle(Paint.Style.FILL);
+        dstRectF.set(x, y, x + width, y + height);
+        canvas.drawOval(dstRectF, paint);
+    }
+
+    // maybe add fillOval w/ RectF param - Vichy97
+
+    // maybe add 2 draw ovals - Vichy97
+
     public void drawImage(Bitmap bitmap, int x, int y) {
         canvas.drawBitmap(bitmap, x, y, paint);
     }
@@ -55,10 +69,6 @@ public class Painter {
         canvas.drawBitmap(bitmap, srcRect, dstRect, paint);
     }
 
-    public void fillOval(int x, int y, int width, int height) {
-        paint.setStyle(Paint.Style.FILL);
-        dstRectF.set(x, y, x + width, y + height);
-        canvas.drawOval(dstRectF, paint);
-    }
+
 
 }

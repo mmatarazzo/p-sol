@@ -42,11 +42,6 @@ public class GameMainActivity extends Activity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
-    /*@Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }*/
-
     @Override
     protected void onResume() {
         Log.d("GameMainActivity", "onResume()");

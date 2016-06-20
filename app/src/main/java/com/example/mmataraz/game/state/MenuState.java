@@ -49,7 +49,8 @@ public class MenuState extends State {
                 playButton.cancel();
                 // Perform an action here!
                 Log.d("MenuState", "Play Button Pressed!");
-                setCurrentState(new PlayState());
+                //setCurrentState(new LoadPlayState());
+                setCurrentState(new LevelSelectState());
 
                 // If score button is active and the release was within the score button:
             } else if (optionsButton.isPressed(scaledX, scaledY)) {
@@ -65,5 +66,11 @@ public class MenuState extends State {
 
         return true;
     }
+
+    @Override
+    public void onPause() {}
+
+    @Override
+    public void onResume() {}
 
 }

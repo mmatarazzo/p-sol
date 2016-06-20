@@ -1,13 +1,16 @@
 package com.example.mmataraz.projectsol;
 
+import android.annotation.TargetApi;
 import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapFactory.Options;
+import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
+import android.os.Build;
 import android.util.Log;
 
 import com.example.mmataraz.framework.animation.Animation;
@@ -22,32 +25,29 @@ import java.io.InputStream;
  */
 public class Assets {
 
+    // audio
     private static SoundPool soundPool;
-    public static int hitID, /*onJumpID,*/ fireID, destroyID;
+    public static int hitID, fireID, destroyID;
+
+    private static MediaPlayer mediaPlayer;
+    private static int mediaPosition = 0;
+
+    private static float fxVolume = 0.75f;
 
     // splash
     public static Bitmap welcome, begin, beginDown, options, optionsDown;
 
     // gameplay objects and background
-    public static Bitmap earth, asteroid;
+    public static Bitmap earth, mars, asteroid;
     public static Bitmap earthOne, earthTwo, earthThree, earthFour, earthFive, earthSix,
             earthSeven, earthEight, earthNine, earthTen, earthEleven, earthTwelve;
-
-    // ship and weapons
     public static Bitmap /*ship1, ship2, ship3,*/ level, upOne, upTwo, downOne, downTwo, laserItem;
 
     // animations
     public static Animation earthAnim;
     public static Animation /*shipAnim,*/ levelAnim, upOneAnim, upTwoAnim, downOneAnim, downTwoAnim;
 
-    // sound
-    private static float fxVolume = 50.0f;
-
-    // music
-    private static MediaPlayer mediaPlayer;
-    private static int mediaPosition = 0;
-
-    public static void load() {
+    public static void loadMenuAssets() {
         // splash
         welcome = loadBitmap("welcome.png", false);
         begin = loadBitmap("begin_button.png", true);
@@ -55,14 +55,22 @@ public class Assets {
         options = loadBitmap("options_button.png", true);
         optionsDown = loadBitmap("options_button_down.png", true);
 
-        // gameplay objects and background
+        // level select
         earth = loadBitmap("earth-new.png", true);
+        mars = loadBitmap("mars.png", true);
+    }
+
+    public static void loadPlayAssets() {
+        // gameplay objects and background
+        //earth = loadBitmap("earth-new.png", true);    // a different backdrop would go here
+        //mars = loadBitmap("mars.png", true);          // a different backdrop would go here
         asteroid = loadBitmap("asteroid1.png", false);
 
         // ship and weapons
         /*ship1 = loadBitmap("shiptest_anim1.png", true);
         ship2 = loadBitmap("shiptest_anim2.png", true);
         ship3 = loadBitmap("shiptest_anim3.png", true);*/
+
         level = loadBitmap("arwing-straight.png", true);
         upOne = loadBitmap("arwing-leftOne.png", true);
         upTwo = loadBitmap("arwing-leftTwo.png", true);
@@ -90,6 +98,25 @@ public class Assets {
         upTwoAnim = new Animation(up2);
         downOneAnim = new Animation(down1);
         downTwoAnim = new Animation(down2);
+    }
+
+    public static void unloadMenuAssets() {
+        unloadBitmap(welcome);
+        unloadBitmap(begin);
+        unloadBitmap(beginDown);
+        unloadBitmap(options);
+        unloadBitmap(optionsDown);
+    }
+
+    public static void unloadPlayAssets() {
+        unloadBitmap(earth);
+        unloadBitmap(asteroid);
+        unloadBitmap(level);
+        unloadBitmap(upOne);
+        unloadBitmap(upTwo);
+        unloadBitmap(downOne);
+        unloadBitmap(downTwo);
+        unloadBitmap(laserItem);
     }
 
     private static void loadEarthAnim() {
@@ -123,26 +150,21 @@ public class Assets {
     }
 
     public static void onResume() {
+        // load sounds
         hitID = loadSound("hit.wav");
-        //onJumpID = loadSound("onjump.wav");
         fireID = loadSound("laser2.wav");
         destroyID = loadSound("explode.wav");
-        //playMusic("Polfix.mid", true);    // don't play music until game is actually unpaused
     }
 
     public static void onPause() {
+        // release sounds
         if (soundPool != null) {
             soundPool.release();
             soundPool = null;
         }
 
         // maybe pause music goes here?
-
-        /*if (mediaPlayer != null) {
-            mediaPlayer.stop();
-            mediaPlayer.release();
-            mediaPlayer = null;
-        }*/
+        //stopMusic();
     }
 
     private static Bitmap loadBitmap(String filename, Boolean transparency) {
@@ -160,14 +182,21 @@ public class Assets {
             options.inPreferredConfig = Config.RGB_565;
         }
 
-        Bitmap bitmap = BitmapFactory.decodeStream(inputStream, null, new Options());
+        Bitmap bitmap = BitmapFactory.decodeStream(inputStream, null, /*new Options()*/ options);
         return bitmap;
+    }
+
+    // from Vichy97
+    private static void unloadBitmap(Bitmap bitmap) {
+        bitmap.recycle();
+        bitmap = null;
     }
 
     private static int loadSound(String filename) {
         int soundID = 0;
         if (soundPool == null) {
-            soundPool = new SoundPool(25, AudioManager.STREAM_MUSIC, 0);
+            //soundPool = new SoundPool(25, AudioManager.STREAM_MUSIC, 0);
+            buildSoundPool();
         }
         try {
             soundID = soundPool.load(GameMainActivity.assets.openFd(filename), 1);
@@ -176,6 +205,27 @@ public class Assets {
         }
 
         return soundID;
+    }
+
+    // from Vichy97
+    @SuppressWarnings("deprecation")
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private static SoundPool buildSoundPool() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_GAME)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .build();
+
+            soundPool = new SoundPool.Builder()
+                    .setMaxStreams(25)
+                    .setAudioAttributes(audioAttributes)
+                    .build();
+        } else {
+            soundPool = new SoundPool(25, AudioManager.STREAM_MUSIC, 0);
+        }
+
+        return soundPool;
     }
 
     public static void playSound(int soundID) {
@@ -205,12 +255,14 @@ public class Assets {
         }
     }
 
+    // might need eventually
     public static void pauseMusic() {
         if (mediaPlayer != null) {
             mediaPlayer.pause();
         }
     }
 
+    // might need eventually
     public static void resumeMusic() {
         if (mediaPlayer != null) {
             mediaPlayer.start();
@@ -229,6 +281,10 @@ public class Assets {
         }
     }
 
+    public static void resetMusic() {
+        mediaPosition = 0;
+    }
+
     public static void updateVolumes(int vol) {
         fxVolume = (vol - 50) / 200.0f;
 
@@ -236,5 +292,9 @@ public class Assets {
         fxVolume = ((vol - 100) / 200.0f) > 1.0f ? 1.0f : ((vol - 100) / 200.0f);*/
 
         Log.d("Volume", Float.toString(fxVolume));
+    }
+
+    public static float getFxVolume() {
+        return fxVolume;
     }
 }
