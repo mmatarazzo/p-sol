@@ -2,13 +2,11 @@ package com.example.mmataraz.game.model;
 
 import android.graphics.Color;
 import android.graphics.Rect;
-import android.util.Log;
 
 import com.example.mmataraz.framework.util.Painter;
 import com.example.mmataraz.projectsol.Assets;
 import com.example.mmataraz.projectsol.GameMainActivity;
 
-import java.io.Console;
 import java.util.ArrayList;
 
 /**
@@ -26,12 +24,10 @@ public class Player {
     private boolean firing, dual, isAlive;
 
     // ship speed
-    //private static final int MAX_VELOCITY_Y = 192;    // 30 degrees
-    private static final int MAX_VELOCITY_Y = /*230*/ 288;  // >30 degrees of 400   // maybe 295 or 288
-    //private static final int MAX_VELOCITY_X = 384;
-    private static final int MAX_VELOCITY_X = /*400*/ 512; // easier    // maybe 512
+    private /*static final*/ int /*MAX_VELOCITY_Y*/ maxVelY = /*230*/ 288;  // >30 degrees of 400
+    private /*static final*/ int /*MAX_VELOCITY_X*/ maxVelX= /*400*/ 512; // easier
 
-    private static final int WEAPON_ENERGY = 20;
+    private /*static final*/ int /*WEAPON_ENERGY*/ weaponEnergy = 20;
 
     // weapon
     private static final int LASER_WIDTH = 8;
@@ -91,7 +87,7 @@ public class Player {
     }
 
     private void updateEnergy() {
-        if (energy < WEAPON_ENERGY)
+        if (energy < /*WEAPON_ENERGY*/ weaponEnergy)
             energy = 800;
         if (energy < 800)
             energy++;
@@ -107,7 +103,7 @@ public class Player {
             // update rects must go after the next section because yPos is changing
 
             // LASER START - needs some adjustment?
-            if (energy >= WEAPON_ENERGY && firing && !w.getRender()) {
+            if (energy >= /*WEAPON_ENERGY*/ weaponEnergy && firing && !w.getRender()) {
                 if ((int) w.getX() >= x + width - 1 && (int) w.getX() <= x + width + /*7*/ 11) {
 
                     //if (currentAnim == Assets.levelAnim) {
@@ -142,7 +138,7 @@ public class Player {
 
                     Assets.playSound(Assets.fireID);    // lol, maybe swap?
                     w.setRender(true);
-                    energy -= WEAPON_ENERGY;
+                    energy -= /*WEAPON_ENERGY*/ weaponEnergy;
                 }
             }
 
@@ -207,12 +203,8 @@ public class Player {
         velY = (Math.abs(nextVelY) < MAX_VELOCITY_Y) ? nextVelY : velY;*/
 
         // should just lock at max if max is exceeded
-        velX = (Math.abs(nextVelX) > MAX_VELOCITY_X) ? (nextVelX < 0 ? -MAX_VELOCITY_X : MAX_VELOCITY_X) : nextVelX;
-        velY = (Math.abs(nextVelY) > MAX_VELOCITY_Y) ? (nextVelY < 0 ? -MAX_VELOCITY_Y : MAX_VELOCITY_Y) : nextVelY;
-
-        // Show velocity here
-        //Log.d("VelX", String.valueOf(velX));
-        //Log.d("VelY", String.valueOf(velY));
+        velX = (Math.abs(nextVelX) > /*MAX_VELOCITY_X*/ maxVelX) ? (nextVelX < 0 ? /*-MAX_VELOCITY_X*/ -maxVelX : /*MAX_VELOCITY_X*/ maxVelX) : nextVelX;
+        velY = (Math.abs(nextVelY) > /*MAX_VELOCITY_Y*/ maxVelY) ? (nextVelY < 0 ? /*-MAX_VELOCITY_Y*/ -maxVelY : /*MAX_VELOCITY_Y*/ maxVelY) : nextVelY;
     }
 
     public boolean checkInsideLeft(float checkX) {

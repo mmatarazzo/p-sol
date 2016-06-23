@@ -15,7 +15,7 @@ public class Weapon {
     private Rect rect;
     private boolean render;
 
-    private static final int LASER_SPEED = /*512*/ 768; // pretty fast!
+    private static final int LASER_SPEED = /*768*/ 640;
     private static final int LASER_DISTANCE = 384;
 
     public Weapon(float x, float y, int width, int height) {

@@ -17,8 +17,8 @@ public class ScoreState extends State {
     private String highScore;
     //private String scoreMessage = "THE ALL-TIME HIGH SCORE";
 
-    private int musicSliderPosX = 0;
-    private int fxSliderPosX = 200;
+    private int musicSliderPosX = 0;    // eventually
+    private int fxSliderPosX = 0;
     private boolean sliderTouch = false;
 
     public ScoreState() {
@@ -27,7 +27,7 @@ public class ScoreState extends State {
 
     @Override
     public void init() {
-        fxSliderPosX = 50 + ((int)Assets.getFxVolume() * 200);
+        fxSliderPosX = (int)(50 + Assets.getFxVolume() * 200);
     }
 
     @Override
@@ -69,7 +69,8 @@ public class ScoreState extends State {
             if (Math.abs(scaledX - fxSliderPosX) < 20 && Math.abs(scaledY - 405) < 20)
                 sliderTouch = true;
         } else if (e.getAction() == MotionEvent.ACTION_MOVE) {
-            fxSliderPosX = scaledX < 50 ? 50 : (scaledX > 250 ? 250 : scaledX);
+            if (sliderTouch)
+                fxSliderPosX = scaledX < 50 ? 50 : (scaledX > 250 ? 250 : scaledX);
             //Log.d("FX Volume:", Integer.toString(fxSliderPosX));
         } else if (e.getAction() == MotionEvent.ACTION_UP) {
             if (!sliderTouch)

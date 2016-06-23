@@ -16,7 +16,6 @@ import android.util.Log;
 import com.example.mmataraz.framework.animation.Animation;
 import com.example.mmataraz.framework.animation.Frame;
 
-import java.io.FileDescriptor;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -39,12 +38,12 @@ public class Assets {
 
     // gameplay objects and background
     public static Bitmap earth, mars, asteroid;
-    public static Bitmap earthOne, earthTwo, earthThree, earthFour, earthFive, earthSix,
-            earthSeven, earthEight, earthNine, earthTen, earthEleven, earthTwelve;
+    /*public static Bitmap earthOne, earthTwo, earthThree, earthFour, earthFive, earthSix,
+            earthSeven, earthEight, earthNine, earthTen, earthEleven, earthTwelve;*/
     public static Bitmap /*ship1, ship2, ship3,*/ level, upOne, upTwo, downOne, downTwo, laserItem;
 
     // animations
-    public static Animation earthAnim;
+    //public static Animation earthAnim;
     public static Animation /*shipAnim,*/ levelAnim, upOneAnim, upTwoAnim, downOneAnim, downTwoAnim;
 
     public static void loadMenuAssets() {
@@ -79,7 +78,7 @@ public class Assets {
         laserItem = loadBitmap("laser_big.png", true);
 
         // animations
-        loadEarthAnim();
+        //loadEarthAnim();
 
         /*Frame sf1 = new Frame(ship1, .2f);
         Frame sf2 = new Frame(ship2, .2f);
@@ -119,7 +118,7 @@ public class Assets {
         unloadBitmap(laserItem);
     }
 
-    private static void loadEarthAnim() {
+    /*private static void loadEarthAnim() {
         earthOne = loadBitmap("earth/earth-one.png", true);
         earthTwo = loadBitmap("earth/earth-two.png", true);
         earthThree = loadBitmap("earth/earth-three.png", true);
@@ -147,7 +146,7 @@ public class Assets {
         Frame e12 = new Frame(earthTwelve, 16.0f);
 
         earthAnim = new Animation(e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12);
-    }
+    }*/
 
     public static void onResume() {
         // load sounds
@@ -287,11 +286,7 @@ public class Assets {
 
     public static void updateVolumes(int vol) {
         fxVolume = (vol - 50) / 200.0f;
-
-        /*fxVolume = ((vol - 100) / 200.0f) < 0.0f ? 0.0f : ((vol - 100) / 200.0f);
-        fxVolume = ((vol - 100) / 200.0f) > 1.0f ? 1.0f : ((vol - 100) / 200.0f);*/
-
-        Log.d("Volume", Float.toString(fxVolume));
+        //Log.d("Volume", Float.toString(fxVolume));
     }
 
     public static float getFxVolume() {

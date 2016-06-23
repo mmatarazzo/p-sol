@@ -1,5 +1,6 @@
 package com.example.mmataraz.game.state;
 
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.Typeface;
@@ -24,36 +25,36 @@ public class PlayState extends State {
 
     private ArrayList<Asteroid> asteroids;
     private Item dualLaser;
-    private Planet earth, mars;
+    private Planet /*earth, mars*/ planet;
     private Player player;
     private ArrayList<Star> spaceDust;
     private ArrayList<Star> stars;
     private Animation currentAnim;
 
-    private static final int NUM_ASTEROIDS = 8;
-    private static final int ASTEROID_SPACING = 125;
-    private static final int ASTEROID_WIDTH = Assets.asteroid.getWidth();
-    private static final int ASTEROID_HEIGHT = Assets.asteroid.getHeight();
+    //private static final int NUM_ASTEROIDS = 8;
+    //private static final int ASTEROID_SPACING = 125;
+    private static final int ASTEROID_WIDTH = /*Assets.asteroid.getWidth()*/ 50;
+    private static final int ASTEROID_HEIGHT = /*Assets.asteroid.getHeight()*/ 50;
     private int asteroidSpeed = -200;
 
-    private static final int ITEM_WIDTH = Assets.laserItem.getWidth();
-    private static final int ITEM_HEIGHT = Assets.laserItem.getHeight();
+    private static final int ITEM_WIDTH = /*Assets.laserItem.getWidth()*/ 240;
+    private static final int ITEM_HEIGHT = /*Assets.laserItem.getHeight()*/ 240;
 
-    private static final int PLANET_START_X = GameMainActivity.GAME_WIDTH / 50;
-    private static final int PLANET_START_Y = /*96*/ /*-159*/
-            (GameMainActivity.GAME_HEIGHT / 2) - (Assets.earth.getHeight() / 2);  // center the planet
+    //private static final int PLANET_START_X = GameMainActivity.GAME_WIDTH / 50;
+    //private static final int PLANET_START_Y = /*96*/ /*-159*/
+            //(GameMainActivity.GAME_HEIGHT / 2) - (Assets.earth.getHeight() / 2);  // center the planet
 
-    private static final int PLAYER_START_X = 256;
-    private static final int PLAYER_START_Y = 128;
-    private static final int PLAYER_WIDTH = Assets.level.getWidth();
-    private static final int PLAYER_HEIGHT = Assets.level.getHeight();
+    //private static final int PLAYER_START_X = 256;
+    //private static final int PLAYER_START_Y = 128;
+    private static final int PLAYER_WIDTH = /*Assets.level.getWidth()*/ 32;
+    private static final int PLAYER_HEIGHT = /*Assets.level.getHeight()*/ 32;
     private int playerScore = 0;
     //private String playerScoreString;
 
-    private static final int SPACEDUST_CHOICE = 2;
-    private static final int NUM_SPACEDUST = 32;
-    private static final int STAR_CHOICE = 1;
-    private static final int NUM_STARS = 64;
+    //private static final int SPACEDUST_CHOICE = 2;
+    //private static final int NUM_SPACEDUST = 32;
+    //private static final int STAR_CHOICE = 1;
+    //private static final int NUM_STARS = 64;
 
     private float recentTouchY;
     private float recentTouchX;
@@ -69,12 +70,15 @@ public class PlayState extends State {
     // String displayed when paused;
     private String pausedString = "Game paused. Tap to resume.";
 
+    private Bitmap planetImage;
+    private String musicString;
+
     @Override
     public void init() {
         // asteroids
         asteroids = new ArrayList<Asteroid>();
-        for (int i = 0; i < NUM_ASTEROIDS; i++) {
-            Asteroid a = new Asteroid((float) i * ASTEROID_SPACING, (float) GameMainActivity.GAME_HEIGHT,
+        for (int i = 0; i < /*NUM_ASTEROIDS*/ 8; i++) {
+            Asteroid a = new Asteroid((float) i * /*ASTEROID_SPACING*/ 125, (float) GameMainActivity.GAME_HEIGHT,
                     ASTEROID_WIDTH, ASTEROID_HEIGHT);
             asteroids.add(a);
         }
@@ -83,46 +87,66 @@ public class PlayState extends State {
         dualLaser = new Item((float) GameMainActivity.GAME_WIDTH, (float) GameMainActivity.GAME_HEIGHT,
                 ITEM_WIDTH, ITEM_HEIGHT);
 
-        // planet
-        earth = new Planet(PLANET_START_X, PLANET_START_Y);
-        mars = new Planet(PLANET_START_X, PLANET_START_Y);
+        // planet old
+        //earth = new Planet(/*PLANET_START_X*/ 32, (GameMainActivity.GAME_HEIGHT / 2) - (Assets.earth.getHeight() / 2));
+        //mars = new Planet(/*PLANET_START_X*/ 32, (GameMainActivity.GAME_HEIGHT / 2) - (Assets.mars.getHeight() / 2));
 
-        player = new Player(PLAYER_START_X, PLAYER_START_Y, PLAYER_WIDTH, PLAYER_HEIGHT);
+        // planet and image
+        planetImage = getPlanetImage();
+        planet = new Planet(/*PLANET_START_X*/ 32, (GameMainActivity.GAME_HEIGHT / 2) - (planetImage.getHeight() / 2));
+
+        // player and animation
+        currentAnim = Assets.levelAnim;
+        player = new Player(/*PLAYER_START_X*/ 256, /*PLAYER_START_Y*/ 128, PLAYER_WIDTH, PLAYER_HEIGHT);
 
         // spacedust
         spaceDust = new ArrayList<Star>();
-        for (int i = 0; i < NUM_SPACEDUST; i++) {
-            Star s = new Star(SPACEDUST_CHOICE);
+        for (int i = 0; i < /*NUM_SPACEDUST*/ 32; i++) {
+            Star s = new Star(/*SPACEDUST_CHOICE*/ 2);
             spaceDust.add(s);
         }
 
         // stars
         stars = new ArrayList<Star>();
-        for (int i = 0; i < NUM_STARS; i++) {
-            Star c = new Star(STAR_CHOICE);
+        for (int i = 0; i < /*NUM_STARS*/ 64; i++) {
+            Star c = new Star(/*STAR_CHOICE*/ 1);
             stars.add(c);
         }
 
-        // animation
-        currentAnim = Assets.levelAnim;
-
-        // music
+        // reset music
         Assets.resetMusic();
-        selectMusic();
+        musicString = selectMusic();
+        Assets.playMusic(musicString, true);
     }
 
-    private void selectMusic() {
+    private Bitmap getPlanetImage() {
         switch (currentLevel) {
             case EARTH:
-                Assets.playMusic("earth-projsol-21.wav", true);
-                break;
+                return Assets.earth;
 
             case MARS:
-                Assets.playMusic("mars-projsol-05.wav", true);
-                break;
+                return Assets.mars;
 
             default:
-                break;
+                return Assets.earth;
+        }
+    }
+
+    private String selectMusic() {
+        switch (currentLevel) {
+            case EARTH:
+                return "earth-projsol-21.wav";
+                //Assets.playMusic("earth-projsol-21.wav", true);
+                //break;
+
+            case MARS:
+                return "mars-projsol-05.wav";
+                //Assets.playMusic("mars-projsol-05.wav", true);
+                //break;
+
+            default:
+                return "";
+                //break;
         }
     }
 
@@ -145,15 +169,19 @@ public class PlayState extends State {
         }
 
         // update earth next
-        if (earth.getVisible()) {
+        /*if (earth.getVisible()) {
             earth.update(delta);
-            Assets.earthAnim.update(delta);
+            //Assets.earthAnim.update(delta);
         }
 
-        // update earth next
+        // update mars next
         if (mars.getVisible()) {
             mars.update(delta);
-            //Assets.earthAnim.update(delta);
+        }*/
+
+        // update planet next
+        if (planet.getVisible()) {
+            planet.update(delta);
         }
 
         // update stars last
@@ -243,7 +271,7 @@ public class PlayState extends State {
 
     // render earth
     private void renderPlanet(Painter g) {
-        if (currentLevel == PlayStateLevel.EARTH) {
+        /*if (currentLevel == PlayStateLevel.EARTH) {
             if (earth.getVisible()) {
                 g.drawImage(Assets.earth, (int) earth.getX(), (int) earth.getY());
                 //Assets.earthAnim.render(g, (int) earth.getX(), (int) earth.getY());
@@ -252,6 +280,11 @@ public class PlayState extends State {
             if (mars.getVisible()) {
                 g.drawImage(Assets.mars, (int) mars.getX(), (int) mars.getY());
             }
+        }*/
+
+        if (planet.getVisible()) {
+            g.drawImage(planetImage, (int) planet.getX(), (int) planet.getY(),
+                    planetImage.getWidth(), planetImage.getHeight());
         }
     }
 
@@ -400,6 +433,7 @@ public class PlayState extends State {
             if (gamePaused) {
                 gamePaused = false;
                 selectMusic();
+                //Assets.playMusic(selectMusic(), true);
             }
 
             //if (!sliderTouch)
@@ -418,5 +452,12 @@ public class PlayState extends State {
         Assets.stopMusic();     // call stop music instead
         gamePaused = true;
     }
+
+    /*@Override
+    public void onResume() {
+        if (!gamePaused)
+            selectMusic();
+            //Assets.playMusic(selectMusic(), true);
+    }*/
 
 }

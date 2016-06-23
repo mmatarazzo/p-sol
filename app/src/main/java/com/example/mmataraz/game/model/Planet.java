@@ -8,10 +8,8 @@ import com.example.mmataraz.projectsol.GameMainActivity;
 public class Planet {
 
     private float x, y;
-    //private int width, height;
     private boolean visible;
-
-    private static final int PLANET_SPEED = -4;
+    private /*static final*/ int /*PLANET_SPEED*/ planetSpeed = -4;
 
     public Planet(float x, float y) {
         this.x = x;
@@ -20,7 +18,7 @@ public class Planet {
     }
 
     public void update(float delta) {
-        x += PLANET_SPEED * delta;
+        x += /*PLANET_SPEED*/ planetSpeed * delta;
 
         if (x < -GameMainActivity.GAME_WIDTH)
             visible = false;
