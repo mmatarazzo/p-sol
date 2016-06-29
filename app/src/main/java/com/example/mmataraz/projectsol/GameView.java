@@ -10,7 +10,8 @@ import android.view.SurfaceView;
 
 import com.example.mmataraz.framework.util.InputHandler;
 import com.example.mmataraz.framework.util.Painter;
-import com.example.mmataraz.game.state.LoadMenuState;
+import com.example.mmataraz.game.state.InitState;
+import com.example.mmataraz.game.state.LoadState;
 import com.example.mmataraz.game.state.State;
 
 /**
@@ -45,7 +46,7 @@ public class GameView extends SurfaceView implements Runnable {
                 Log.d("GameView", "Surface Created");
                 initInput();
                 if (currentState == null) {
-                    setCurrentState(new LoadMenuState());
+                    setCurrentState(new InitState());
                 }
                 initGame();
             }

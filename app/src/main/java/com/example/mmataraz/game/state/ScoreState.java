@@ -15,7 +15,6 @@ import com.example.mmataraz.projectsol.GameMainActivity;
 public class ScoreState extends State {
 
     private String highScore;
-    //private String scoreMessage = "THE ALL-TIME HIGH SCORE";
 
     private int musicSliderPosX = 0;    // eventually
     private int fxSliderPosX = 0;
@@ -37,19 +36,11 @@ public class ScoreState extends State {
 
     @Override
     public void render(Painter g) {
-        //g.setColor(Color.rgb(53, 156, 253));
-        //g.setColor(Color.rgb(64, 64, 128));
-        //g.fillRect(0, 0, GameMainActivity.GAME_WIDTH, GameMainActivity.GAME_HEIGHT);
-
-        g.drawImage(Assets.welcome, 0, 0);  // duh
+        g.drawImage(Assets.welcome, 0, 0);
         g.setColor(Color.WHITE);
-        g.setFont(Typeface.DEFAULT_BOLD, /*50*/ 32);
-        //g.drawString("THE ALL-TIME HIGH SCORE IS:", 120, 175);
+        g.setFont(Typeface.DEFAULT_BOLD, 32);
         g.drawString("HIGH SCORE:", 50, 50);
-        //g.setFont(Typeface.DEFAULT_BOLD, /*70*/ 64);
         g.drawString(highScore, 250, 50);
-        //g.setFont(Typeface.DEFAULT_BOLD, 50);
-        //g.drawString("Touch to go back.", 220, 350);
 
         renderSliders(g);
     }
@@ -83,9 +74,13 @@ public class ScoreState extends State {
     }
 
     @Override
-    public void onPause() {}
+    public void onPause() {
+
+    }
 
     @Override
-    public void onResume() {}
+    public void onResume() {
+
+    }
 
 }

@@ -7,8 +7,6 @@ import com.example.mmataraz.framework.util.Painter;
  */
 public class Animation {
 
-    // eventually add looping feature - Vichy97
-
     private Frame[] frames;
     private double[] frameEndTimes;
     private int currentFrameIndex = 0;
@@ -16,7 +14,11 @@ public class Animation {
     private double totalDuration = 0;
     private double currentTime = 0;
 
-    public Animation(Frame... frames) {
+    // added looping feature - Vichy97
+    private boolean looping = true;
+
+    public Animation(Boolean looping, Frame... frames) {
+        this.looping = looping;
         this.frames = frames;
         frameEndTimes = new double[frames.length];
 
@@ -29,13 +31,14 @@ public class Animation {
 
     public synchronized void update(float increment) {
         currentTime += increment;
-
-        if (currentTime > totalDuration) {
+        if (currentTime > totalDuration && looping) {
             wrapAnimation();
         }
 
-        while (currentTime > frameEndTimes[currentFrameIndex]) {
-            currentFrameIndex++;
+        if (currentFrameIndex < frameEndTimes.length) {
+            while (currentTime > frameEndTimes[currentFrameIndex]) {
+                currentFrameIndex++;
+            }
         }
     }
 

@@ -17,10 +17,7 @@ public class Item {
 
     private static final int UPPER_Y = 128;
     private static final int LOWER_Y = GameMainActivity.GAME_HEIGHT - 128;
-
-    private /*static final*/ int /*ITEM_SPEED*/ itemSpeed = -128;
-    //private static final int MIN_START_TIME = 1024;
-    //private static final int MAX_START_TIME = 2048;
+    private int itemSpeed = -128;
 
     public Item(float x, float y, int width, int height) {
         this.x = x;
@@ -28,21 +25,15 @@ public class Item {
 
         this.width = width;
         this.height = height;
-        startTime = RandomNumberGenerator.getRandIntBetween(/*MIN_START_TIME*/ 1024, /*MAX_START_TIME*/ 2048);
-
+        startTime = RandomNumberGenerator.getRandIntBetween(1024, 2048);
         visible = false;
 
         rect = new Rect((int) x, (int) y, (int) x + width, (int) y + height);
     }
 
-    public void update(float delta/*, Player p, int timer*/) {
-        /*if (!p.getDual() && !visible && timer > startTime) {
-            visible = true;
-            y = RandomNumberGenerator.getRandIntBetween(UPPER_Y, LOWER_Y);
-        }*/
-
+    public void update(float delta) {
         if (visible) {
-            x += /*ITEM_SPEED*/ itemSpeed * delta;
+            x += itemSpeed * delta;
             updateRect();
         }
 

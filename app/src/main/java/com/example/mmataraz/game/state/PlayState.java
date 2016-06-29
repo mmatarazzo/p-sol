@@ -24,61 +24,76 @@ import java.util.ArrayList;
 public class PlayState extends State {
 
     private ArrayList<Asteroid> asteroids;
-    private Item dualLaser;
-    private Planet /*earth, mars*/ planet;
+    private Item dualLaser; //tbd
+    private Planet planet;
     private Player player;
     private ArrayList<Star> spaceDust;
     private ArrayList<Star> stars;
     private Animation currentAnim;
 
-    //private static final int NUM_ASTEROIDS = 8;
-    //private static final int ASTEROID_SPACING = 125;
-    private static final int ASTEROID_WIDTH = /*Assets.asteroid.getWidth()*/ 50;
-    private static final int ASTEROID_HEIGHT = /*Assets.asteroid.getHeight()*/ 50;
+    // asteroids
+    private static final int ASTEROID_WIDTH = 50;
+    private static final int ASTEROID_HEIGHT = 50;
     private int asteroidSpeed = -200;
 
-    private static final int ITEM_WIDTH = /*Assets.laserItem.getWidth()*/ 240;
-    private static final int ITEM_HEIGHT = /*Assets.laserItem.getHeight()*/ 240;
+    // item - tbd
+    private static final int ITEM_WIDTH = 240;
+    private static final int ITEM_HEIGHT = 240;
 
-    //private static final int PLANET_START_X = GameMainActivity.GAME_WIDTH / 50;
-    //private static final int PLANET_START_Y = /*96*/ /*-159*/
-            //(GameMainActivity.GAME_HEIGHT / 2) - (Assets.earth.getHeight() / 2);  // center the planet
-
-    //private static final int PLAYER_START_X = 256;
-    //private static final int PLAYER_START_Y = 128;
-    private static final int PLAYER_WIDTH = /*Assets.level.getWidth()*/ 32;
-    private static final int PLAYER_HEIGHT = /*Assets.level.getHeight()*/ 32;
+    // player
+    private static final int PLAYER_WIDTH = 32;
+    private static final int PLAYER_HEIGHT = 32;
     private int playerScore = 0;
-    //private String playerScoreString;
 
-    //private static final int SPACEDUST_CHOICE = 2;
-    //private static final int NUM_SPACEDUST = 32;
-    //private static final int STAR_CHOICE = 1;
-    //private static final int NUM_STARS = 64;
-
+    // input
     private float recentTouchY;
     private float recentTouchX;
 
-    private int timer = 0;
-
-    /*private int musicSliderPosX = 0;
-    private int fxSliderPosX = 200;
-    private boolean sliderTouch = false;*/
+    // other
+    private int timer = 0;  // tbd
+    private Bitmap planetImage;
+    private String musicString;
 
     // Boolean to keep track of game pauses.
     private boolean gamePaused = false;
     // String displayed when paused;
     private String pausedString = "Game paused. Tap to resume.";
 
-    private Bitmap planetImage;
-    private String musicString;
+    private Rect pauseRect = new Rect(32, 32, 128, 128);
+    private Rect quitRect = new Rect(32, GameMainActivity.GAME_HEIGHT-128, 128, GameMainActivity.GAME_HEIGHT-32);
+
+    private PlayStateLevel currentLevel;
+
+    // constructor
+    public PlayState(PlayStateLevel level) {
+        currentLevel = level;
+    }
 
     @Override
     public void init() {
+
+        // set up level image and music
+        switch (currentLevel) {
+            case EARTH:
+                planetImage = Assets.earth;
+                musicString = "earth-projsol-21.wav";
+                break;
+
+            case MARS:
+                planetImage = Assets.mars;
+                musicString = "mars-projsol-05.wav";
+                break;
+
+            default:
+                planetImage = Assets.earth;
+                musicString = "earth-projsol-21.wav";
+                break;
+        }
+
         // asteroids
         asteroids = new ArrayList<Asteroid>();
-        for (int i = 0; i < /*NUM_ASTEROIDS*/ 8; i++) {
-            Asteroid a = new Asteroid((float) i * /*ASTEROID_SPACING*/ 125, (float) GameMainActivity.GAME_HEIGHT,
+        for (int i = 0; i < 8; i++) {
+            Asteroid a = new Asteroid((float) i*125, (float) GameMainActivity.GAME_HEIGHT,
                     ASTEROID_WIDTH, ASTEROID_HEIGHT);
             asteroids.add(a);
         }
@@ -87,36 +102,42 @@ public class PlayState extends State {
         dualLaser = new Item((float) GameMainActivity.GAME_WIDTH, (float) GameMainActivity.GAME_HEIGHT,
                 ITEM_WIDTH, ITEM_HEIGHT);
 
-        // planet old
-        //earth = new Planet(/*PLANET_START_X*/ 32, (GameMainActivity.GAME_HEIGHT / 2) - (Assets.earth.getHeight() / 2));
-        //mars = new Planet(/*PLANET_START_X*/ 32, (GameMainActivity.GAME_HEIGHT / 2) - (Assets.mars.getHeight() / 2));
-
         // planet and image
-        planetImage = getPlanetImage();
-        planet = new Planet(/*PLANET_START_X*/ 32, (GameMainActivity.GAME_HEIGHT / 2) - (planetImage.getHeight() / 2));
+        //planetImage = getPlanetImage();
+        planet = new Planet(32, GameMainActivity.GAME_HEIGHT/2 - planetImage.getHeight()/2);
 
         // player and animation
         currentAnim = Assets.levelAnim;
-        player = new Player(/*PLAYER_START_X*/ 256, /*PLAYER_START_Y*/ 128, PLAYER_WIDTH, PLAYER_HEIGHT);
+        player = new Player(256, 128, PLAYER_WIDTH, PLAYER_HEIGHT);
 
         // spacedust
         spaceDust = new ArrayList<Star>();
-        for (int i = 0; i < /*NUM_SPACEDUST*/ 32; i++) {
-            Star s = new Star(/*SPACEDUST_CHOICE*/ 2);
+        for (int i = 0; i < 32; i++) {
+            Star s = new Star(2);
             spaceDust.add(s);
         }
 
         // stars
         stars = new ArrayList<Star>();
-        for (int i = 0; i < /*NUM_STARS*/ 64; i++) {
-            Star c = new Star(/*STAR_CHOICE*/ 1);
+        for (int i = 0; i < 64; i++) {
+            Star c = new Star(1);
             stars.add(c);
         }
 
         // reset music
         Assets.resetMusic();
-        musicString = selectMusic();
+        //musicString = selectMusic();
         Assets.playMusic(musicString, true);
+    }
+
+    @Override
+    public void onLoad() {
+        Assets.loadPlayAssets();
+    }
+
+    @Override
+    public void onExit() {
+        Assets.unloadPlayAssets();
     }
 
     private Bitmap getPlanetImage() {
@@ -136,30 +157,25 @@ public class PlayState extends State {
         switch (currentLevel) {
             case EARTH:
                 return "earth-projsol-21.wav";
-                //Assets.playMusic("earth-projsol-21.wav", true);
-                //break;
 
             case MARS:
                 return "mars-projsol-05.wav";
-                //Assets.playMusic("mars-projsol-05.wav", true);
-                //break;
 
             default:
                 return "";
-                //break;
         }
     }
 
     @Override
     public void update(float delta) {
-        // If game is paused, do not update anything.
-        if (gamePaused) {
-            return;
-        }
-
         if (!player.isAlive()) {
             Assets.stopMusic();
             setCurrentState(new GameOverState(playerScore));
+        }
+
+        // If game is paused, do not update anything.
+        if (gamePaused) {
+            return;
         }
 
         // update spacedust
@@ -167,17 +183,6 @@ public class PlayState extends State {
             Star s = spaceDust.get(i);
             s.update(delta);
         }
-
-        // update earth next
-        /*if (earth.getVisible()) {
-            earth.update(delta);
-            //Assets.earthAnim.update(delta);
-        }
-
-        // update mars next
-        if (mars.getVisible()) {
-            mars.update(delta);
-        }*/
 
         // update planet next
         if (planet.getVisible()) {
@@ -193,28 +198,23 @@ public class PlayState extends State {
         currentAnim.update(delta);
         playerScore += player.update(delta, asteroids);
 
+        //asteroidSpeed = Asteroid.getVelX();
         if (playerScore > 30 && asteroidSpeed > -280) {
             asteroidSpeed -= 10;
+            Asteroid.setVelX(asteroidSpeed);
         }
 
         updateDualLaser(delta);
-        /*dualLaser.update(delta, player, timer);
-        if (dualLaser.isVisible())
-            if (Rect.intersects(dualLaser.getRect(), player.getRect()))
-                dualLaser.onCollide(player);*/
-
         updateAsteroids(delta);
 
         if (++timer > 60000)
             timer = 0;
-
-        //Assets.updateVolumes(fxSliderPosX);
     }
 
     private void updateDualLaser(float delta) {
         dualLaser.checkItemAppear(player.getDual(), timer);
 
-        dualLaser.update(delta/*, player, timer*/);
+        dualLaser.update(delta);
         if (dualLaser.isVisible())
             if (Rect.intersects(dualLaser.getRect(), player.getRect()))
                 dualLaser.onCollide(player);
@@ -226,6 +226,7 @@ public class PlayState extends State {
             a.update(delta, asteroidSpeed);
 
             if (a.isVisible()) {
+                // box collision detection
                 if (Rect.intersects(a.getRect(), player.getRect()))
                     a.onCollide(player);
             }
@@ -248,9 +249,7 @@ public class PlayState extends State {
         renderShield(g);
         //renderEnergy(g);
 
-        //renderSliders(g);   // new
-
-        // If game is Pause, draw additional UI elements:
+        // If game is Paused, draw additional UI elements:
         if (gamePaused) {
             // ARGB is used to set an ARGB color.
             g.setColor(Color.argb(160, 0, 0, 0));
@@ -271,17 +270,6 @@ public class PlayState extends State {
 
     // render earth
     private void renderPlanet(Painter g) {
-        /*if (currentLevel == PlayStateLevel.EARTH) {
-            if (earth.getVisible()) {
-                g.drawImage(Assets.earth, (int) earth.getX(), (int) earth.getY());
-                //Assets.earthAnim.render(g, (int) earth.getX(), (int) earth.getY());
-            }
-        } else if (currentLevel == PlayStateLevel.MARS) {
-            if (mars.getVisible()) {
-                g.drawImage(Assets.mars, (int) mars.getX(), (int) mars.getY());
-            }
-        }*/
-
         if (planet.getVisible()) {
             g.drawImage(planetImage, (int) planet.getX(), (int) planet.getY(),
                     planetImage.getWidth(), planetImage.getHeight());
@@ -306,7 +294,6 @@ public class PlayState extends State {
     private void renderAsteroids(Painter g) {
         for (int i = 0; i < asteroids.size(); i++) {
             Asteroid a = asteroids.get(i);
-        //for (Asteroid b : asteroids) {
             if (a.isVisible()) {
                 g.drawImage(Assets.asteroid, (int) a.getX(), (int) a.getY(),
                         ASTEROID_WIDTH, ASTEROID_HEIGHT);
@@ -324,7 +311,6 @@ public class PlayState extends State {
         g.setFont(Typeface.DEFAULT_BOLD, 18);
         g.setColor(Color.WHITE);
 
-        //playerScoreString = String.valueOf(playerScore);
         String scoreString = Integer.toString(playerScore);
         g.drawString("SCORE: ", 30, 30);
         g.drawString(scoreString, 100, 30);
@@ -359,13 +345,6 @@ public class PlayState extends State {
         g.fillRect(610, 15, 1, 15);
     }
 
-    /*private void renderSliders(Painter g) {
-        g.setColor(Color.WHITE);
-
-        g.fillRect(50, 400, 200, 10);
-        g.fillOval(fxSliderPosX-25, 385, 40, 40);
-    }*/
-
     @Override
     public boolean onTouch(MotionEvent e, int scaledX, int scaledY) {
         //Log.d("Var", String.valueOf(recentTouchY));
@@ -376,70 +355,82 @@ public class PlayState extends State {
             if (gamePaused)
                 return true;
 
-            //Log.d("Var", String.valueOf(recentTouchY));
-
-            /*if (Math.abs(scaledX - fxSliderPosX) < 20 && Math.abs(scaledY - 405) < 20) {
-                sliderTouch = true;
-            }*/
-            // check if slider was touched
-            // if so, set a flag saying slider was touched
-            // or do if statement
+            if (pauseRect.intersects(scaledX, scaledY, scaledX, scaledY)) {
+                //gamePaused = true;
+                return true;
+            }
 
             recentTouchY = scaledY;
             recentTouchX = scaledX; // new
 
-            /*if (!sliderTouch)*/
-                player.setFiringStatus(true);
+            player.setFiringStatus(true);
 
         } else if (e.getAction() == MotionEvent.ACTION_MOVE) {
             // return if pause?
             if (gamePaused)
                 return true;
 
+            if (pauseRect.intersects(scaledX, scaledY, scaledX, scaledY)) {
+                //gamePaused = true;
+                player.setFiringStatus(false);
+                return true;
+            } else {
+                player.setFiringStatus(true);
+            }
+
             // to add some simple acceleration physics, use delta values
             // to change velocity, not just position..
             int deltaY = scaledY - (int) recentTouchY;
             int deltaX = scaledX - (int) recentTouchX;
 
-            //if (!sliderTouch) {
-                player.maneuver(deltaY, deltaX);
+            player.maneuver(deltaY, deltaX);
 
-                // here is where you would determine which direction
-                // the movement was in, and then load the appropriate animation
+            // here is where you would determine which direction
+            // the movement was in, and then load the appropriate animation
 
-                // change values according to angle
-                if (Math.abs(player.getVelY()) <= /*8*/ 70)
-                    currentAnim = Assets.levelAnim;
-                else if (player.getVelY() > /*8*/ 70 && player.getVelY() <= /*32*/ 145)
-                    currentAnim = Assets.downOneAnim;
-                else if (player.getVelY() > /*32*/ 145)
-                    currentAnim = Assets.downTwoAnim;
-                else if (player.getVelY() < /*-8*/ -70 && player.getVelY() >= /*-32*/ -145)
-                    currentAnim = Assets.upOneAnim;
-                else if (player.getVelY() < /*-32*/ -145)
-                    currentAnim = Assets.upTwoAnim;
-            //} else {
-                //fxSliderPosX += deltaX;
-                /*int nextSliderPos = fxSliderPosX + deltaX;
-
-                fxSliderPosX = nextSliderPos < 50 ? 50 : nextSliderPos;
-                fxSliderPosX = nextSliderPos > 250 ? 250 : nextSliderPos;*/
-            //}
+            // change values according to angle
+            if (Math.abs(player.getVelY()) <= /*8*/ 70)
+                currentAnim = Assets.levelAnim;
+            else if (player.getVelY() > /*8*/ 70 && player.getVelY() <= /*32*/ 145)
+                currentAnim = Assets.downOneAnim;
+            else if (player.getVelY() > /*32*/ 145)
+                currentAnim = Assets.downTwoAnim;
+            else if (player.getVelY() < /*-8*/ -70 && player.getVelY() >= /*-32*/ -145)
+                currentAnim = Assets.upOneAnim;
+            else if (player.getVelY() < /*-32*/ -145)
+                currentAnim = Assets.upTwoAnim;
 
             recentTouchY = scaledY;
             recentTouchX = scaledX; // new
         } else if (e.getAction() == MotionEvent.ACTION_UP) {
             // Resume game if paused.
             if (gamePaused) {
+
+                if (quitRect.intersects(scaledX, scaledY, scaledX, scaledY)) {
+                    player.setAlive(false);
+                    return true;
+                }
+
                 gamePaused = false;
-                selectMusic();
-                //Assets.playMusic(selectMusic(), true);
+
+                if (Assets.resumeMusic())
+                    return true;
+                else {
+                    musicString = selectMusic();
+                    Assets.playMusic(musicString, true);
+                    return true;
+                }
+                //selectMusic();
             }
 
-            //if (!sliderTouch)
-                player.setFiringStatus(false);
-            //else
-                //sliderTouch = false;
+            if (pauseRect.intersects(scaledX, scaledY, scaledX, scaledY)) {
+                gamePaused = true;
+                Assets.pauseMusic();
+                //onPause();
+                return true;
+            }
+
+            player.setFiringStatus(false);
         }
 
         return true;
@@ -449,15 +440,13 @@ public class PlayState extends State {
     // Called when Activity is pausing.
     @Override
     public void onPause() {
-        Assets.stopMusic();     // call stop music instead
+        Assets.stopMusic();
         gamePaused = true;
     }
 
-    /*@Override
+    @Override
     public void onResume() {
-        if (!gamePaused)
-            selectMusic();
-            //Assets.playMusic(selectMusic(), true);
-    }*/
+
+    }
 
 }

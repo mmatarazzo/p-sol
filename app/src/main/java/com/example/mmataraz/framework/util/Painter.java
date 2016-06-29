@@ -69,6 +69,4 @@ public class Painter {
         canvas.drawBitmap(bitmap, srcRect, dstRect, paint);
     }
 
-
-
 }

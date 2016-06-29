@@ -27,24 +27,21 @@ public class Assets {
     // audio
     private static SoundPool soundPool;
     public static int hitID, fireID, destroyID;
+    private static float fxVolume = 0.75f;
 
+    // music
     private static MediaPlayer mediaPlayer;
     private static int mediaPosition = 0;
 
-    private static float fxVolume = 0.75f;
-
-    // splash
+    // splash and ui buttons
     public static Bitmap welcome, begin, beginDown, options, optionsDown;
 
     // gameplay objects and background
     public static Bitmap earth, mars, asteroid;
-    /*public static Bitmap earthOne, earthTwo, earthThree, earthFour, earthFive, earthSix,
-            earthSeven, earthEight, earthNine, earthTen, earthEleven, earthTwelve;*/
-    public static Bitmap /*ship1, ship2, ship3,*/ level, upOne, upTwo, downOne, downTwo, laserItem;
+    public static Bitmap level, upOne, upTwo, downOne, downTwo, laserItem;
 
     // animations
-    //public static Animation earthAnim;
-    public static Animation /*shipAnim,*/ levelAnim, upOneAnim, upTwoAnim, downOneAnim, downTwoAnim;
+    public static Animation levelAnim, upOneAnim, upTwoAnim, downOneAnim, downTwoAnim;
 
     public static void loadMenuAssets() {
         // splash
@@ -64,42 +61,35 @@ public class Assets {
         //earth = loadBitmap("earth-new.png", true);    // a different backdrop would go here
         //mars = loadBitmap("mars.png", true);          // a different backdrop would go here
         asteroid = loadBitmap("asteroid1.png", false);
+        // more bitmaps for asteroid frames
 
-        // ship and weapons
-        /*ship1 = loadBitmap("shiptest_anim1.png", true);
-        ship2 = loadBitmap("shiptest_anim2.png", true);
-        ship3 = loadBitmap("shiptest_anim3.png", true);*/
-
+        // ship and lasers
         level = loadBitmap("arwing-straight.png", true);
         upOne = loadBitmap("arwing-leftOne.png", true);
         upTwo = loadBitmap("arwing-leftTwo.png", true);
         downOne = loadBitmap("arwing-rightOne.png", true);
         downTwo = loadBitmap("arwing-rightTwo.png", true);
         laserItem = loadBitmap("laser_big.png", true);
+        // more bitmaps for ship and laser frames
 
         // animations
-        //loadEarthAnim();
+        Frame lvl = new Frame(level, .9f);
+        Frame up1 = new Frame(upOne, .9f);
+        Frame up2 = new Frame(upTwo, .9f);
+        Frame down1 = new Frame(downOne, .9f);
+        Frame down2 = new Frame(downTwo, .9f);
+        // more frames here for ship, lasers and explosion
 
-        /*Frame sf1 = new Frame(ship1, .2f);
-        Frame sf2 = new Frame(ship2, .2f);
-        Frame sf3 = new Frame(ship3, .2f);
-        shipAnim = new Animation(sf1, sf2, sf3);*/
-
-        // could add the other "sprites" here as a new Anim obj
-        Frame lvl = new Frame(level, .3f);
-        Frame up1 = new Frame(upOne, .3f);
-        Frame up2 = new Frame(upTwo, .3f);
-        Frame down1 = new Frame(downOne, .3f);
-        Frame down2 = new Frame(downTwo, .3f);
-
-        levelAnim = new Animation(lvl);
-        upOneAnim = new Animation(up1);
-        upTwoAnim = new Animation(up2);
-        downOneAnim = new Animation(down1);
-        downTwoAnim = new Animation(down2);
+        levelAnim = new Animation(true, lvl);
+        upOneAnim = new Animation(true, up1);
+        upTwoAnim = new Animation(true, up2);
+        downOneAnim = new Animation(true, down1);
+        downTwoAnim = new Animation(true, down2);
+        // more animations for ship, lasers and explosion
     }
 
     public static void unloadMenuAssets() {
+        // unload menu-only bitmaps
         unloadBitmap(welcome);
         unloadBitmap(begin);
         unloadBitmap(beginDown);
@@ -108,7 +98,9 @@ public class Assets {
     }
 
     public static void unloadPlayAssets() {
+        // unload play state assets
         unloadBitmap(earth);
+        unloadBitmap(mars);
         unloadBitmap(asteroid);
         unloadBitmap(level);
         unloadBitmap(upOne);
@@ -117,36 +109,6 @@ public class Assets {
         unloadBitmap(downTwo);
         unloadBitmap(laserItem);
     }
-
-    /*private static void loadEarthAnim() {
-        earthOne = loadBitmap("earth/earth-one.png", true);
-        earthTwo = loadBitmap("earth/earth-two.png", true);
-        earthThree = loadBitmap("earth/earth-three.png", true);
-        earthFour = loadBitmap("earth/earth-four.png", true);
-        earthFive = loadBitmap("earth/earth-five.png", true);
-        earthSix = loadBitmap("earth/earth-six.png", true);
-        earthSeven = loadBitmap("earth/earth-seven.png", true);
-        earthEight = loadBitmap("earth/earth-eight.png", true);
-        earthNine = loadBitmap("earth/earth-nine.png", true);
-        earthTen = loadBitmap("earth/earth-ten.png", true);
-        earthEleven = loadBitmap("earth/earth-eleven.png", true);
-        earthTwelve = loadBitmap("earth/earth-twelve.png", true);
-
-        Frame e1 = new Frame(earthOne, 16.0f);
-        Frame e2 = new Frame(earthTwo, 16.0f);
-        Frame e3 = new Frame(earthThree, 16.0f);
-        Frame e4 = new Frame(earthFour, 16.0f);
-        Frame e5 = new Frame(earthFive, 16.0f);
-        Frame e6 = new Frame(earthSix, 16.0f);
-        Frame e7 = new Frame(earthSeven, 16.0f);
-        Frame e8 = new Frame(earthEight, 16.0f);
-        Frame e9 = new Frame(earthNine, 16.0f);
-        Frame e10 = new Frame(earthTen, 16.0f);
-        Frame e11 = new Frame(earthEleven, 16.0f);
-        Frame e12 = new Frame(earthTwelve, 16.0f);
-
-        earthAnim = new Animation(e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12);
-    }*/
 
     public static void onResume() {
         // load sounds
@@ -161,9 +123,6 @@ public class Assets {
             soundPool.release();
             soundPool = null;
         }
-
-        // maybe pause music goes here?
-        //stopMusic();
     }
 
     private static Bitmap loadBitmap(String filename, Boolean transparency) {
@@ -262,16 +221,19 @@ public class Assets {
     }
 
     // might need eventually
-    public static void resumeMusic() {
+    public static boolean resumeMusic() {
         if (mediaPlayer != null) {
             mediaPlayer.start();
+            return true;
         }
+        else
+            return false;
     }
 
     public static void stopMusic() {
         if (mediaPlayer != null) {
 
-            // just call stop music, save the position, and release resources
+            // save the position before releasing resources
             mediaPosition = mediaPlayer.getCurrentPosition();   // test
 
             mediaPlayer.stop();
@@ -292,4 +254,5 @@ public class Assets {
     public static float getFxVolume() {
         return fxVolume;
     }
+
 }

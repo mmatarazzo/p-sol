@@ -24,14 +24,15 @@ public class Player {
     private boolean firing, dual, isAlive;
 
     // ship speed
-    private /*static final*/ int /*MAX_VELOCITY_Y*/ maxVelY = /*230*/ 288;  // >30 degrees of 400
-    private /*static final*/ int /*MAX_VELOCITY_X*/ maxVelX= /*400*/ 512; // easier
-
-    private /*static final*/ int /*WEAPON_ENERGY*/ weaponEnergy = 20;
+    private int maxVelY= 288; // >30 degrees of 400
+    private int maxVelX= 512;
 
     // weapon
     private static final int LASER_WIDTH = 8;
     private static final int LASER_HEIGHT = 1;
+    private int weaponEnergy = 20;
+
+    private int mass = 100;
 
     public Player(float x, float y, int width, int height) {
         this.x = x;
@@ -82,12 +83,11 @@ public class Player {
     }
 
     public void updateRects() {
-        //rect.set((int) x, (int) y + 28, (int) x + (width - 8), (int) y + (height - 27));
         rect.set((int) x, (int) y, (int) x + width, (int) y + height);
     }
 
     private void updateEnergy() {
-        if (energy < /*WEAPON_ENERGY*/ weaponEnergy)
+        if (energy < weaponEnergy)
             energy = 800;
         if (energy < 800)
             energy++;
@@ -103,42 +103,32 @@ public class Player {
             // update rects must go after the next section because yPos is changing
 
             // LASER START - needs some adjustment?
-            if (energy >= /*WEAPON_ENERGY*/ weaponEnergy && firing && !w.getRender()) {
-                if ((int) w.getX() >= x + width - 1 && (int) w.getX() <= x + width + /*7*/ 11) {
-
-                    //if (currentAnim == Assets.levelAnim) {
-                    if (Math.abs(velY) <= /*8*/ 70) {
+            if (energy >= weaponEnergy && firing && !w.getRender()) {
+                if ((int) w.getX() >= x + width - 1 && (int) w.getX() <= x + width + 11) {
+                    if (Math.abs(velY) <= 70) {
                         w.setVelY(0);
                         w.setY(y + height / 2);
                     }
-                    //else if (currentAnim == Assets.upOneAnim) {
-                    else if (velY < /*-8*/ -70 && velY >= /*-32*/ -145) {
+                    else if (velY < -70 && velY >= -145) {
                         w.setVelY(-1);
-                        //w.setY(y + 3 * height / 8);
-                        w.setY(y + height / 2 - 3); // for more accurate tan(10)
+                        w.setY(y + height/2 - 3); // for more accurate tan(10)
                     }
-                    //else if (currentAnim == Assets.upTwoAnim) {
-                    else if (velY < /*-32*/ -145) {
+                    else if (velY < -145) {
                         w.setVelY(-2);
-                        //w.setY(y + height / 4);
                         w.setY(y + height / 2 - 6); // for more accurate tan(20)
                     }
-                    //} else if (currentAnim == Assets.downOneAnim) {
-                    else if (velY > /*8*/ 70 && velY <= /*32*/ 145) {
+                    else if (velY > 70 && velY <= 145) {
                         w.setVelY(1);
-                        //w.setY(y + 5 * height / 8);
                         w.setY(y + height / 2 + 3); // for more accurate tan(10)
                     }
-                    //else if (currentAnim == Assets.downTwoAnim) {
                     else if (velY > /*32*/ 145) {
                         w.setVelY(2);
-                        //w.setY(y + 3 * height / 4);
                         w.setY(y + height / 2 + 6); // for more accurate tan(20)
                     }
 
-                    Assets.playSound(Assets.fireID);    // lol, maybe swap?
                     w.setRender(true);
-                    energy -= /*WEAPON_ENERGY*/ weaponEnergy;
+                    energy -= weaponEnergy;
+                    Assets.playSound(Assets.fireID);
                 }
             }
 
@@ -188,7 +178,6 @@ public class Player {
             isAlive = false;
         }
 
-        //rect.set((int) x, (int) y, (int) x + width, (int) y + height);
         updateRects();
     }
 
@@ -198,13 +187,9 @@ public class Player {
         nextVelX = velX + dX * /*2*/ 3; // try 3 for more sensitive movement?
         nextVelY = velY + dY * /*2*/ 3;
 
-        // old max velocity check
-        /*velX = (Math.abs(nextVelX) < MAX_VELOCITY_X) ? nextVelX : velX;
-        velY = (Math.abs(nextVelY) < MAX_VELOCITY_Y) ? nextVelY : velY;*/
-
         // should just lock at max if max is exceeded
-        velX = (Math.abs(nextVelX) > /*MAX_VELOCITY_X*/ maxVelX) ? (nextVelX < 0 ? /*-MAX_VELOCITY_X*/ -maxVelX : /*MAX_VELOCITY_X*/ maxVelX) : nextVelX;
-        velY = (Math.abs(nextVelY) > /*MAX_VELOCITY_Y*/ maxVelY) ? (nextVelY < 0 ? /*-MAX_VELOCITY_Y*/ -maxVelY : /*MAX_VELOCITY_Y*/ maxVelY) : nextVelY;
+        velX = (Math.abs(nextVelX) > maxVelX) ? (nextVelX < 0 ? -maxVelX : maxVelX) : nextVelX;
+        velY = (Math.abs(nextVelY) > maxVelY) ? (nextVelY < 0 ? -maxVelY : maxVelY) : nextVelY;
     }
 
     public boolean checkInsideLeft(float checkX) {
@@ -239,6 +224,10 @@ public class Player {
         return height;
     }
 
+    public int getVelX() {
+        return velX;
+    }
+
     public int getVelY() {
         return velY;
     }
@@ -267,8 +256,23 @@ public class Player {
         return dual;
     }
 
+    public void setAlive(boolean alive) {
+        this.isAlive = alive;
+    }
+
     public boolean isAlive() {
         return isAlive;
     }
 
+    public int getMass() {
+        return mass;
+    }
+
+    public void setVelX(float velX) {
+        this.velX = (int) velX;
+    }
+
+    public void setVelY(float velY) {
+        this.velY = (int) velY;
+    }
 }

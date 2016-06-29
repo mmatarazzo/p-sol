@@ -10,8 +10,8 @@ import com.example.mmataraz.projectsol.GameMainActivity;
  */
 public abstract class State {
 
-    protected enum PlayStateLevel {EARTH, MARS, SATURN, JUPITER, NUM_LEVELS}
-    protected static PlayStateLevel currentLevel = PlayStateLevel.NUM_LEVELS;
+    protected enum PlayStateLevel {EARTH, MARS, NUM_LEVELS}
+    //protected PlayStateLevel currentLevel = PlayStateLevel.NUM_LEVELS;
 
     public void setCurrentState(State newState) {
         GameMainActivity.sGame.setCurrentState(newState);
@@ -19,18 +19,22 @@ public abstract class State {
 
     public abstract void init();
 
+    public void onLoad() {
+
+    }
+
+    public void onExit() {
+
+    }
+
     public abstract void update(float delta);
 
     public abstract void render(Painter g);
 
     public abstract boolean onTouch(MotionEvent e, int scaledX, int scaledY);
 
-    public void onPause() {}
+    public abstract void onPause();
 
-    public void onResume() {}
-
-    public void load() {}
-
-    public void unload() {}
+    public abstract void onResume();
 
 }

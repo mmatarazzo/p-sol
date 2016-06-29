@@ -13,28 +13,21 @@ public class Star {
     private float x, y;
     private int size, speed, color;
 
-    //private static final int MIN_SIZE = 1;
-    //private static final int MAX_SIZE = 3;
-
-    //private static final int MAX_STAR_SPEED = /*3*/ 4;
-    //private static final int MIN_DUST_SPEED = 64;
-    //private static final int MAX_DUST_SPEED = 128;
-
     private static final int[] STAR_COLORS = { Color.RED, Color.YELLOW, Color.CYAN, Color.WHITE };
     private static final int[] DUST_COLORS = { Color.LTGRAY, Color.GRAY, Color.DKGRAY, Color.BLACK };
 
     public Star(int choice) {
         x = RandomNumberGenerator.getRandIntBetween(4, GameMainActivity.GAME_WIDTH - 4);
         y = RandomNumberGenerator.getRandIntBetween(4, GameMainActivity.GAME_HEIGHT - 4);
-        size = RandomNumberGenerator.getRandIntBetween(/*MIN_SIZE*/ 1, /*MAX_SIZE*/ 3);
+        size = RandomNumberGenerator.getRandIntBetween(1, 3);
 
         switch (choice) {
             case 1: // star
-                speed = RandomNumberGenerator.getRandInt(/*MAX_STAR_SPEED*/ 4);
+                speed = RandomNumberGenerator.getRandInt(4);
                 color = STAR_COLORS[RandomNumberGenerator.getRandInt(STAR_COLORS.length)];
                 break;
             case 2: // spacedust
-                speed = RandomNumberGenerator.getRandIntBetween(/*MIN_DUST_SPEED*/ 64, /*MAX_DUST_SPEED*/ 128);
+                speed = RandomNumberGenerator.getRandIntBetween(64, 128);
                 color = DUST_COLORS[RandomNumberGenerator.getRandInt(DUST_COLORS.length)];
                 break;
             default:
@@ -48,7 +41,6 @@ public class Star {
         if (x <= -4) {
             // Reset to the right
             x += (GameMainActivity.GAME_WIDTH + 4);
-            //y = RandomNumberGenerator.getRandIntBetween(4, 446);
             y = RandomNumberGenerator.getRandIntBetween(4, GameMainActivity.GAME_HEIGHT - 4);
         }
     }

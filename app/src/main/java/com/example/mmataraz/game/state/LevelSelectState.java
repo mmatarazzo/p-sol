@@ -18,8 +18,20 @@ public class LevelSelectState extends State {
 
     @Override
     public void init() {
-        earthButton = new UIButton(250, 50, 250 + Assets.earth.getWidth()/4, 50 + Assets.earth.getHeight()/4, Assets.earth, Assets.earth);
-        marsButton = new UIButton(250, 250, 250 + Assets.mars.getWidth()/4, 250 + Assets.mars.getHeight()/4, Assets.mars, Assets.mars);
+        earthButton = new UIButton(250, 50, 250 + Assets.earth.getWidth()/4,
+                50 + Assets.earth.getHeight()/4, Assets.earth, Assets.earth);
+        marsButton = new UIButton(250, 250, 250 + Assets.mars.getWidth()/4,
+                250 + Assets.mars.getHeight()/4, Assets.mars, Assets.mars);
+    }
+
+    @Override
+    public void onLoad() {
+        //Assets.loadMenuAssets();
+    }
+
+    @Override
+    public void onExit() {
+        Assets.unloadMenuAssets();
     }
 
     @Override
@@ -28,16 +40,13 @@ public class LevelSelectState extends State {
 
     @Override
     public void render(Painter g) {
-        g.drawImage(Assets.welcome, 0, 0);  // duh
+        g.drawImage(Assets.welcome, 0, 0);
 
         g.setColor(Color.WHITE);
-        g.setFont(Typeface.DEFAULT_BOLD, /*50*/ 24);
-
+        g.setFont(Typeface.DEFAULT_BOLD, 24);
         g.drawString("EARTH:", 50, 50);
         g.drawString("MARS:", 50, 250);
 
-        //g.drawImage(Assets.earth, 250, 50, 100, 100);
-        //g.drawImage(Assets.mars, 250, 250, 100, 100);
         earthButton.render(g);
         marsButton.render(g);
     }
@@ -49,16 +58,6 @@ public class LevelSelectState extends State {
             marsButton.onTouchDown(scaledX, scaledY);
         }
 
-        /*if (e.getAction() == MotionEvent.ACTION_UP) {
-            if (scaledX > 150 && scaledX < 350 && scaledY > 50 && scaledY < 150) {
-                Assets.setLevelID(0);
-                setCurrentState(new LoadPlayState());
-            } else if (scaledX > 150 && scaledX < 350 && scaledY > 250 && scaledY < 350) {
-                Assets.setLevelID(1);
-                setCurrentState(new LoadPlayState());
-            }
-        }*/
-
         if (e.getAction() == MotionEvent.ACTION_UP) {
             // If the play button is active and the release was within the play button:
             if (earthButton.isPressed(scaledX, scaledY)) {
@@ -66,17 +65,15 @@ public class LevelSelectState extends State {
                 earthButton.cancel();
                 // Perform an action here!
                 Log.d("LevelSelectState", "Earth level selected!");
-                //Assets.setLevelID(0);
-                currentLevel = PlayStateLevel.EARTH;
-                setCurrentState(new LoadPlayState());
+                //currentLevel = PlayStateLevel.EARTH;
+                setCurrentState(new LoadState(this, new PlayState(PlayStateLevel.EARTH)));
 
                 // If score button is active and the release was within the score button:
             } else if (marsButton.isPressed(scaledX, scaledY)) {
                 marsButton.cancel();
                 Log.d("LevelSelectState", "Mars level selected!");
-                //Assets.setLevelID(1);
-                currentLevel = PlayStateLevel.MARS;
-                setCurrentState(new LoadPlayState());
+                //currentLevel = PlayStateLevel.MARS;
+                setCurrentState(new LoadState(this, new PlayState(PlayStateLevel.MARS)));
             } else {
                 // Cancel all actions.
                 earthButton.cancel();
@@ -88,9 +85,13 @@ public class LevelSelectState extends State {
     }
 
     @Override
-    public void onPause() {}
+    public void onPause() {
+
+    }
 
     @Override
-    public void onResume() {}
+    public void onResume() {
+
+    }
 
 }

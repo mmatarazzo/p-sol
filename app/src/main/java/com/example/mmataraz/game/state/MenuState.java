@@ -7,6 +7,8 @@ import com.example.mmataraz.framework.util.Painter;
 import com.example.mmataraz.framework.util.UIButton;
 import com.example.mmataraz.projectsol.Assets;
 
+import java.util.logging.Level;
+
 /**
  * Created by Mike on 2/2/2015.
  */
@@ -21,6 +23,16 @@ public class MenuState extends State {
                 Assets.beginDown);
         optionsButton = new UIButton(764-Assets.options.getWidth(), 128, 764, 128+Assets.options.getHeight(), Assets.options,
                 Assets.optionsDown);
+    }
+
+    @Override
+    public void onLoad() {
+        Assets.loadMenuAssets();
+    }
+
+    @Override
+    public void onExit() {
+        //Assets.unloadMenuAssets();
     }
 
     @Override
@@ -49,8 +61,7 @@ public class MenuState extends State {
                 playButton.cancel();
                 // Perform an action here!
                 Log.d("MenuState", "Play Button Pressed!");
-                //setCurrentState(new LoadPlayState());
-                setCurrentState(new LevelSelectState());
+                setCurrentState(new LoadState(this, new LevelSelectState()));
 
                 // If score button is active and the release was within the score button:
             } else if (optionsButton.isPressed(scaledX, scaledY)) {
@@ -68,9 +79,13 @@ public class MenuState extends State {
     }
 
     @Override
-    public void onPause() {}
+    public void onPause() {
+
+    }
 
     @Override
-    public void onResume() {}
+    public void onResume() {
+
+    }
 
 }

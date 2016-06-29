@@ -39,7 +39,7 @@ public class Weapon {
         else if (x - startX > LASER_DISTANCE)
             render = false;
 
-        if (y < /*-6*/-8 || y > GameMainActivity.GAME_HEIGHT + /*6*/8)
+        if (y < -8 || y > GameMainActivity.GAME_HEIGHT + 8)
             velY = 0;
 
         // to shorten laser travel distance, pick a constant
@@ -49,8 +49,7 @@ public class Weapon {
             if (render)
                 render = false;
 
-            //x -= GameMainActivity.GAME_WIDTH;
-            x -= (GameMainActivity.GAME_WIDTH + width * 2);
+            x -= (GameMainActivity.GAME_WIDTH + width*2);
             // maybe reset y to center? - probably not necessary
         }
     }
@@ -65,9 +64,9 @@ public class Weapon {
 
     public boolean onCollide(Asteroid a) {
         if (render && a.isVisible()) {
-            Assets.playSound(Assets.destroyID); // for sound delay?
             a.setVisible(false);
             render = false;
+            Assets.playSound(Assets.destroyID);
 
             return true;
         }
