@@ -23,15 +23,15 @@ public class GameMainActivity extends Activity {
     private static int highScore;
 
     // resolution testing
-    public static int gameWidth;
-    public static int gameHeight;
+    //public static int gameWidth;
+    //public static int gameHeight;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        gameWidth = getResources().getDisplayMetrics().widthPixels;
-        gameHeight = getResources().getDisplayMetrics().heightPixels;
+        //GAME_WIDTH = getResources().getDisplayMetrics().widthPixels;
+        //GAME_HEIGHT = getResources().getDisplayMetrics().heightPixels;
 
         prefs = getPreferences(Activity.MODE_PRIVATE);
         highScore = retrieveHighScore();

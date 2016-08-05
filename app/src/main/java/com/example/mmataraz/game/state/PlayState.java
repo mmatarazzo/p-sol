@@ -8,6 +8,7 @@ import android.view.MotionEvent;
 
 import com.example.mmataraz.framework.animation.Animation;
 import com.example.mmataraz.framework.util.Painter;
+import com.example.mmataraz.framework.util.UIButton;
 import com.example.mmataraz.game.model.Asteroid;
 import com.example.mmataraz.game.model.Item;
 import com.example.mmataraz.game.model.Planet;
@@ -23,74 +24,76 @@ import java.util.ArrayList;
  */
 public class PlayState extends State {
 
+    // Game objects
     private ArrayList<Asteroid> asteroids;
     private Item dualLaser; //tbd
-    private Planet planet;
     private Player player;
+
+    // Background objects
     private ArrayList<Star> spaceDust;
     private ArrayList<Star> stars;
-    private Animation currentAnim;
+    private Planet planet;
 
-    // asteroids
+    // Asteroid properties
     private static final int ASTEROID_WIDTH = 50;
     private static final int ASTEROID_HEIGHT = 50;
     private int asteroidSpeed = -200;
 
-    // item - tbd
+    // Item properties
     private static final int ITEM_WIDTH = 240;
     private static final int ITEM_HEIGHT = 240;
 
-    // player
+    // Player properties
     private static final int PLAYER_WIDTH = 32;
     private static final int PLAYER_HEIGHT = 32;
     private int playerScore = 0;
 
-    // input
+    // Touch location
     private float recentTouchY;
     private float recentTouchX;
-
-    // other
-    private int timer = 0;  // tbd
-    private Bitmap planetImage;
-    private String musicString;
 
     // Boolean to keep track of game pauses.
     private boolean gamePaused = false;
     // String displayed when paused;
     private String pausedString = "Game paused. Tap to resume.";
 
-    private Rect pauseRect = new Rect(32, 32, 128, 128);
-    private Rect quitRect = new Rect(32, GameMainActivity.GAME_HEIGHT-128, 128, GameMainActivity.GAME_HEIGHT-32);
-
+    // Other current items
+    private Animation currentAnim;
+    private Bitmap planetImage;
+    private String musicString;
     private PlayStateLevel currentLevel;
+    private int timer = 0;
 
-    // constructor
+    // Change to UI buttons
+    private UIButton pauseButton, quitButton;
+    private Rect pauseRect, quitRect;
+
+    // PlayState Constructor
     public PlayState(PlayStateLevel level) {
         currentLevel = level;
     }
 
     @Override
     public void init() {
-
-        // set up level image and music
+        // Determine level background image and music
         switch (currentLevel) {
             case EARTH:
                 planetImage = Assets.earth;
-                musicString = "earth-projsol-21.wav";
+                musicString = "earth-projsol-23.wav";
                 break;
 
             case MARS:
                 planetImage = Assets.mars;
-                musicString = "mars-projsol-05.wav";
+                musicString = "mars-projsol-07.wav";
                 break;
 
             default:
                 planetImage = Assets.earth;
-                musicString = "earth-projsol-21.wav";
+                musicString = "earth-projsol-23.wav";
                 break;
         }
 
-        // asteroids
+        // Init Asteroids
         asteroids = new ArrayList<Asteroid>();
         for (int i = 0; i < 8; i++) {
             Asteroid a = new Asteroid((float) i*125, (float) GameMainActivity.GAME_HEIGHT,
@@ -98,36 +101,40 @@ public class PlayState extends State {
             asteroids.add(a);
         }
 
-        // dual laser item
+        // Init dual laser item
         dualLaser = new Item((float) GameMainActivity.GAME_WIDTH, (float) GameMainActivity.GAME_HEIGHT,
                 ITEM_WIDTH, ITEM_HEIGHT);
 
-        // planet and image
-        //planetImage = getPlanetImage();
-        planet = new Planet(32, GameMainActivity.GAME_HEIGHT/2 - planetImage.getHeight()/2);
-
-        // player and animation
-        currentAnim = Assets.levelAnim;
+        // Init player
         player = new Player(256, 128, PLAYER_WIDTH, PLAYER_HEIGHT);
 
-        // spacedust
+        // Init spacedust
         spaceDust = new ArrayList<Star>();
         for (int i = 0; i < 32; i++) {
             Star s = new Star(2);
             spaceDust.add(s);
         }
 
-        // stars
+        // Init stars
         stars = new ArrayList<Star>();
         for (int i = 0; i < 64; i++) {
             Star c = new Star(1);
             stars.add(c);
         }
 
-        // reset music
+        // Init planet and animation
+        planet = new Planet(32, GameMainActivity.GAME_HEIGHT/2 - planetImage.getHeight()/2);
+        currentAnim = Assets.levelAnim;
+
+        pauseButton = new UIButton(672, 32, 720, 80, Assets.pause, Assets.pauseDown);
+        quitButton = pauseButton;
+        pauseRect = new Rect(672, 32, 720, 80);
+        quitRect = pauseRect;
+
+        // Load and play music
         Assets.resetMusic();
-        //musicString = selectMusic();
-        Assets.playMusic(musicString, true);
+        Assets.loadMusic(musicString, true);
+        Assets.resumeMusic();
     }
 
     @Override
@@ -137,40 +144,15 @@ public class PlayState extends State {
 
     @Override
     public void onExit() {
-        Assets.unloadPlayAssets();
-    }
 
-    private Bitmap getPlanetImage() {
-        switch (currentLevel) {
-            case EARTH:
-                return Assets.earth;
-
-            case MARS:
-                return Assets.mars;
-
-            default:
-                return Assets.earth;
-        }
-    }
-
-    private String selectMusic() {
-        switch (currentLevel) {
-            case EARTH:
-                return "earth-projsol-21.wav";
-
-            case MARS:
-                return "mars-projsol-05.wav";
-
-            default:
-                return "";
-        }
     }
 
     @Override
     public void update(float delta) {
+        // Check this first b/c quit button just sets isAlive to false
         if (!player.isAlive()) {
             Assets.stopMusic();
-            setCurrentState(new GameOverState(playerScore));
+            setCurrentState(new LoadState(this, new GameOverState(playerScore)));
         }
 
         // If game is paused, do not update anything.
@@ -178,43 +160,44 @@ public class PlayState extends State {
             return;
         }
 
-        // update spacedust
-        for (int i = 0; i < spaceDust.size(); i++) {
-            Star s = spaceDust.get(i);
-            s.update(delta);
-        }
-
-        // update planet next
-        if (planet.getVisible()) {
-            planet.update(delta);
-        }
-
-        // update stars last
+        // Update stars
         for (int i = 0; i < stars.size(); i++) {
             Star c = stars.get(i);
             c.update(delta);
         }
 
-        currentAnim.update(delta);
-        playerScore += player.update(delta, asteroids);
+        // Update planet
+        if (planet.getVisible()) {
+            planet.update(delta);
+        }
 
-        //asteroidSpeed = Asteroid.getVelX();
+        // Update spacedust
+        for (int i = 0; i < spaceDust.size(); i++) {
+            Star s = spaceDust.get(i);
+            s.update(delta);
+        }
+
+        // Update game objects
+        playerScore += player.update(delta, asteroids);
+        currentAnim.update(delta);
+        updateDualLaser(delta);
+        updateAsteroids(delta);
+
+        // Increase asteroid speed when score exceeds 30
         if (playerScore > 30 && asteroidSpeed > -280) {
             asteroidSpeed -= 10;
             Asteroid.setVelX(asteroidSpeed);
         }
 
-        updateDualLaser(delta);
-        updateAsteroids(delta);
-
+        // Update timer
         if (++timer > 60000)
             timer = 0;
     }
 
     private void updateDualLaser(float delta) {
         dualLaser.checkItemAppear(player.getDual(), timer);
-
         dualLaser.update(delta);
+
         if (dualLaser.isVisible())
             if (Rect.intersects(dualLaser.getRect(), player.getRect()))
                 dualLaser.onCollide(player);
@@ -226,7 +209,7 @@ public class PlayState extends State {
             a.update(delta, asteroidSpeed);
 
             if (a.isVisible()) {
-                // box collision detection
+                // Box collision detection
                 if (Rect.intersects(a.getRect(), player.getRect()))
                     a.onCollide(player);
             }
@@ -243,8 +226,8 @@ public class PlayState extends State {
         renderPlanet(g);
         renderSpaceDust(g);
         renderPlayer(g);
-        renderAsteroids(g);
         renderItems(g);
+        renderAsteroids(g);
         renderScore(g);
         renderShield(g);
         //renderEnergy(g);
@@ -256,10 +239,14 @@ public class PlayState extends State {
             g.fillRect(0, 0, GameMainActivity.GAME_WIDTH, GameMainActivity.GAME_HEIGHT);
             g.setColor(Color.LTGRAY);
             g.drawString(pausedString, 235, 240);
+
+            quitButton.render(g);
+        } else {
+            // Draw pauseButton if not paused.
+            pauseButton.render(g);
         }
     }
 
-    // render stars
     private void renderStars(Painter g) {
         for (int i = 0; i < stars.size(); i++) {
             Star c = stars.get(i);
@@ -268,14 +255,12 @@ public class PlayState extends State {
         }
     }
 
-    // render earth
     private void renderPlanet(Painter g) {
         if (planet.getVisible()) {
             g.drawImage(planetImage, (int) planet.getX(), (int) planet.getY(),
                     planetImage.getWidth(), planetImage.getHeight());
         }
     }
-
 
     private void renderSpaceDust(Painter g) {
         for (int i = 0; i < spaceDust.size(); i++) {
@@ -291,6 +276,12 @@ public class PlayState extends State {
         player.renderWeapon(g);
     }
 
+    private void renderItems(Painter g) {
+        if (dualLaser.isVisible())
+            g.drawImage(Assets.laserItem, (int) dualLaser.getX(), (int) dualLaser.getY(),
+                    Assets.laserItem.getWidth(), Assets.laserItem.getHeight());
+    }
+
     private void renderAsteroids(Painter g) {
         for (int i = 0; i < asteroids.size(); i++) {
             Asteroid a = asteroids.get(i);
@@ -299,12 +290,6 @@ public class PlayState extends State {
                         ASTEROID_WIDTH, ASTEROID_HEIGHT);
             }
         }
-    }
-
-    private void renderItems(Painter g) {
-        if (dualLaser.isVisible())
-            g.drawImage(Assets.laserItem, (int) dualLaser.getX(), (int) dualLaser.getY(),
-                    Assets.laserItem.getWidth(), Assets.laserItem.getHeight());
     }
 
     private void renderScore(Painter g) {
@@ -347,48 +332,62 @@ public class PlayState extends State {
 
     @Override
     public boolean onTouch(MotionEvent e, int scaledX, int scaledY) {
-        //Log.d("Var", String.valueOf(recentTouchY));
-        //Log.d("Var", String.valueOf(scaledY));
-
         if (e.getAction() == MotionEvent.ACTION_DOWN) {
-            // return if pause?
-            if (gamePaused)
-                return true;
-
-            if (pauseRect.intersects(scaledX, scaledY, scaledX, scaledY)) {
-                //gamePaused = true;
+            // Call onTouchDown for quit button
+            if (gamePaused) {
+                quitButton.onTouchDown(scaledX, scaledY);
                 return true;
             }
 
+            // Call onTouchDown for pause button, and return if pressed
+            pauseButton.onTouchDown(scaledX, scaledY);
+            if (pauseButton.isPressed(scaledX, scaledY)) {
+                return true;
+            }
+
+            /*// Return if the pause button is hit
+            if (pauseRect.intersects(scaledX, scaledY, scaledX, scaledY)) {
+                return true;
+            }*/
+
+            // Store touch location
             recentTouchY = scaledY;
             recentTouchX = scaledX; // new
 
+            // Player is firing
             player.setFiringStatus(true);
 
         } else if (e.getAction() == MotionEvent.ACTION_MOVE) {
-            // return if pause?
-            if (gamePaused)
+            // Return if paused
+            if (gamePaused) {
+                quitButton.onTouchDown(scaledX, scaledY);
                 return true;
+            }
 
+            // If not paused, only return if the pause button was pressed
+            // This means that user pressed the pause button but moved off it
+            //pauseButton.onTouchDown(scaledX, scaledY);
+            if (pauseButton.wasHit()) {
+                pauseButton.onTouchDown(scaledX, scaledY);
+                return true;
+            }
+
+            /*// Action should stop if user slides over pause button - CHANGE
             if (pauseRect.intersects(scaledX, scaledY, scaledX, scaledY)) {
                 //gamePaused = true;
                 player.setFiringStatus(false);
                 return true;
             } else {
                 player.setFiringStatus(true);
-            }
+            }*/
 
-            // to add some simple acceleration physics, use delta values
-            // to change velocity, not just position..
+            // To add some simple acceleration physics, use delta values
+            // between touches to change velocity, not just position..
             int deltaY = scaledY - (int) recentTouchY;
             int deltaX = scaledX - (int) recentTouchX;
-
             player.maneuver(deltaY, deltaX);
 
-            // here is where you would determine which direction
-            // the movement was in, and then load the appropriate animation
-
-            // change values according to angle
+            // Change sprite (animation) based on Y velocity to give the appearance of movement
             if (Math.abs(player.getVelY()) <= /*8*/ 70)
                 currentAnim = Assets.levelAnim;
             else if (player.getVelY() > /*8*/ 70 && player.getVelY() <= /*32*/ 145)
@@ -401,35 +400,61 @@ public class PlayState extends State {
                 currentAnim = Assets.upTwoAnim;
 
             recentTouchY = scaledY;
-            recentTouchX = scaledX; // new
+            recentTouchX = scaledX;
         } else if (e.getAction() == MotionEvent.ACTION_UP) {
             // Resume game if paused.
             if (gamePaused) {
+                // If touch up triggers quit button, quit game
+                if (quitButton.isPressed(scaledX, scaledY)) {
+                    quitButton.cancel();
+                /*}
 
-                if (quitRect.intersects(scaledX, scaledY, scaledX, scaledY)) {
+                // Quit game if quit rect is hit
+                if (quitRect.intersects(scaledX, scaledY, scaledX, scaledY)) {*/
                     player.setAlive(false);
                     return true;
+                } else if (quitButton.wasHit()) {
+                    // If quit button was pressed but user moved off it, return and don't unpause game
+                    quitButton.cancel();
+                    return true;
+                } else {
+                    // Quit button was never pressed
+                    quitButton.cancel();
                 }
 
+                // Unpause game
                 gamePaused = false;
+                // Must cancel pauseButton before onTouch() method returns.
+                pauseButton.cancel();
+                Assets.resumeMusic();
 
-                if (Assets.resumeMusic())
-                    return true;
-                else {
-                    musicString = selectMusic();
-                    Assets.playMusic(musicString, true);
-                    return true;
-                }
-                //selectMusic();
-            }
-
-            if (pauseRect.intersects(scaledX, scaledY, scaledX, scaledY)) {
-                gamePaused = true;
-                Assets.pauseMusic();
-                //onPause();
                 return true;
             }
 
+            // If Touch Up triggers PauseButton, pause the game.
+            if (pauseButton.isPressed(scaledX, scaledY)) {
+                pauseButton.cancel();
+                Assets.pauseMusic();
+                gamePaused = true;
+                return true;
+            } else if (pauseButton.wasHit()) {
+                // If pause button was pressed but user moved off it, return and don't pause game
+                pauseButton.cancel();
+                return true;
+            } else {
+                // Pause button was never hit
+                pauseButton.cancel();
+            }
+
+            /*// Pause game if pause button is hit
+            if (pauseRect.intersects(scaledX, scaledY, scaledX, scaledY)) {
+                Assets.pauseMusic();
+                gamePaused = true;
+
+                return true;
+            }*/
+
+            // Player is not firing
             player.setFiringStatus(false);
         }
 
@@ -446,7 +471,7 @@ public class PlayState extends State {
 
     @Override
     public void onResume() {
-
+        Assets.loadMusic(musicString, true);
     }
 
 }

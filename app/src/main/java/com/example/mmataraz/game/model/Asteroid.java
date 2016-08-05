@@ -20,7 +20,7 @@ public class Asteroid {
     private static final int LOWER_Y = GameMainActivity.GAME_HEIGHT - 64;
 
     private static int velX;
-    private int mass = 300;
+    private int mass = 250;
 
     public Asteroid(float x, float y, int width, int height) {
         this.x = x;
@@ -57,7 +57,7 @@ public class Asteroid {
 
     public void onCollide(Player p) {
         visible = false;
-        //p.pushBack(32);
+        p.pushBack(16);
         Collision.playerAsteroidCollision(p, this);
     }
 

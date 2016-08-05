@@ -10,8 +10,7 @@ import com.example.mmataraz.projectsol.GameMainActivity;
  */
 public abstract class State {
 
-    protected enum PlayStateLevel {EARTH, MARS, NUM_LEVELS}
-    //protected PlayStateLevel currentLevel = PlayStateLevel.NUM_LEVELS;
+    protected enum PlayStateLevel {EARTH, MARS}
 
     public void setCurrentState(State newState) {
         GameMainActivity.sGame.setCurrentState(newState);
@@ -20,11 +19,9 @@ public abstract class State {
     public abstract void init();
 
     public void onLoad() {
-
     }
 
     public void onExit() {
-
     }
 
     public abstract void update(float delta);

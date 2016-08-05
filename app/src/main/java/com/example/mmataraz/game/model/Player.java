@@ -169,6 +169,7 @@ public class Player {
     public void pushBack(int dX) {
         x -= dX;
         Assets.playSound(Assets.hitID);
+
         if (x < -width / 2) {
             isAlive = false;
         }
@@ -270,9 +271,11 @@ public class Player {
 
     public void setVelX(float velX) {
         this.velX = (int) velX;
+        this.velX = (Math.abs(this.velX) > maxVelX) ? (this.velX < 0 ? -maxVelX : maxVelX) : this.velX;
     }
 
     public void setVelY(float velY) {
         this.velY = (int) velY;
+        this.velY = (Math.abs(this.velY) > maxVelY) ? (this.velY < 0 ? -maxVelY : maxVelY) : this.velY;
     }
 }

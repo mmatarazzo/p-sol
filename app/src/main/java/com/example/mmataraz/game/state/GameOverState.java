@@ -26,7 +26,17 @@ public class GameOverState extends State {
 
     @Override
     public void init() {
-        unload();
+
+    }
+
+    @Override
+    public void onLoad() {
+        //Assets.loadMenuAssets();
+    }
+
+    @Override
+    public void onExit() {
+        Assets.unloadPlayAssets();
     }
 
     @Override
@@ -36,9 +46,12 @@ public class GameOverState extends State {
 
     @Override
     public void render(Painter g) {
-        g.setColor(Color.rgb(255, 145, 0));
-        g.fillRect(0, 0, GameMainActivity.GAME_WIDTH, GameMainActivity.GAME_HEIGHT);
-        g.setColor(Color.DKGRAY);
+        //g.setColor(Color.rgb(255, 145, 0));
+        //g.fillRect(0, 0, GameMainActivity.GAME_WIDTH, GameMainActivity.GAME_HEIGHT);
+        g.drawImage(Assets.welcome, 0, 0);
+
+        //g.setColor(Color.DKGRAY);
+        g.setColor(Color.WHITE);
         g.setFont(Typeface.DEFAULT_BOLD, 50);
         g.drawString(gameOverMessage, 257, 175);
         g.drawString(playerScore, 385, 250);
@@ -48,7 +61,7 @@ public class GameOverState extends State {
     @Override
     public boolean onTouch(MotionEvent e, int scaledX, int scaledY) {
         if (e.getAction() == MotionEvent.ACTION_UP) {
-            setCurrentState(new LoadState());
+            setCurrentState(new LoadState(this, new MenuState()));
         }
 
         return true;
@@ -64,13 +77,4 @@ public class GameOverState extends State {
 
     }
 
-    @Override
-    public void load() {
-
-    }
-
-    @Override
-    public void unload() {
-        Assets.unloadPlayAssets();
-    }
 }

@@ -11,7 +11,6 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.os.Build;
-import android.util.Log;
 
 import com.example.mmataraz.framework.animation.Animation;
 import com.example.mmataraz.framework.animation.Frame;
@@ -24,23 +23,23 @@ import java.io.InputStream;
  */
 public class Assets {
 
-    // audio
+    // Sound effects
     private static SoundPool soundPool;
     public static int hitID, fireID, destroyID;
     private static float fxVolume = 0.75f;
 
-    // music
+    // Music
     private static MediaPlayer mediaPlayer;
     private static int mediaPosition = 0;
 
-    // splash and ui buttons
-    public static Bitmap welcome, begin, beginDown, options, optionsDown;
+    // Welcome, menu options and pause button
+    public static Bitmap welcome, begin, beginDown, options, optionsDown, pause, pauseDown;
 
-    // gameplay objects and background
+    // Gameplay objects and background
     public static Bitmap earth, mars, asteroid;
     public static Bitmap level, upOne, upTwo, downOne, downTwo, laserItem;
 
-    // animations
+    // Animation
     public static Animation levelAnim, upOneAnim, upTwoAnim, downOneAnim, downTwoAnim;
 
     public static void loadMenuAssets() {
@@ -57,19 +56,23 @@ public class Assets {
     }
 
     public static void loadPlayAssets() {
+        // pause button
+        pause = loadBitmap("pause_button.png", true);
+        pauseDown = loadBitmap("pause_button_down.png", true);
+
         // gameplay objects and background
         //earth = loadBitmap("earth-new.png", true);    // a different backdrop would go here
         //mars = loadBitmap("mars.png", true);          // a different backdrop would go here
-        asteroid = loadBitmap("asteroid1.png", false);
+        asteroid = loadBitmap("asteroid-psol.png", false);
         // more bitmaps for asteroid frames
 
         // ship and lasers
-        level = loadBitmap("arwing-straight.png", true);
-        upOne = loadBitmap("arwing-leftOne.png", true);
-        upTwo = loadBitmap("arwing-leftTwo.png", true);
-        downOne = loadBitmap("arwing-rightOne.png", true);
-        downTwo = loadBitmap("arwing-rightTwo.png", true);
-        laserItem = loadBitmap("laser_big.png", true);
+        level = loadBitmap("knight/knight-level.png", true);
+        upOne = loadBitmap("knight/knight-upone.png", true);
+        upTwo = loadBitmap("knight/knight-uptwo.png", true);
+        downOne = loadBitmap("knight/knight-downone.png", true);
+        downTwo = loadBitmap("knight/knight-downtwo.png", true);
+        laserItem = loadBitmap("laser-upgrade.png", true);
         // more bitmaps for ship and laser frames
 
         // animations
@@ -90,7 +93,7 @@ public class Assets {
 
     public static void unloadMenuAssets() {
         // unload menu-only bitmaps
-        unloadBitmap(welcome);
+        //unloadBitmap(welcome);
         unloadBitmap(begin);
         unloadBitmap(beginDown);
         unloadBitmap(options);
@@ -99,8 +102,12 @@ public class Assets {
 
     public static void unloadPlayAssets() {
         // unload play state assets
+        unloadBitmap(welcome);
+        unloadBitmap(pause);
+        unloadBitmap(pauseDown);
         unloadBitmap(earth);
         unloadBitmap(mars);
+
         unloadBitmap(asteroid);
         unloadBitmap(level);
         unloadBitmap(upOne);
@@ -115,6 +122,11 @@ public class Assets {
         hitID = loadSound("hit.wav");
         fireID = loadSound("laser2.wav");
         destroyID = loadSound("explode.wav");
+
+        // load multi-state bitmaps
+        //welcome = loadBitmap("welcome.png", false);
+        //earth = loadBitmap("earth-new.png", true);
+        //mars = loadBitmap("mars.png", true);
     }
 
     public static void onPause() {
@@ -123,6 +135,11 @@ public class Assets {
             soundPool.release();
             soundPool = null;
         }
+
+        // release multi-state bitmaps
+        //unloadBitmap(welcome);
+        //unloadBitmap(earth);
+        //unloadBitmap(mars);
     }
 
     private static Bitmap loadBitmap(String filename, Boolean transparency) {
@@ -135,7 +152,7 @@ public class Assets {
 
         Options options = new Options();
         if (transparency) {
-            options.inPreferredConfig = Config.ARGB_8888;
+            options.inPreferredConfig = /*Config.ARGB_8888*/ Config.ARGB_4444;
         } else {
             options.inPreferredConfig = Config.RGB_565;
         }
@@ -192,7 +209,7 @@ public class Assets {
         }
     }
 
-    public static void playMusic(String filename, boolean looping) {
+    public static void loadMusic(String filename, boolean looping) {
         if (mediaPlayer == null) {
             mediaPlayer = new MediaPlayer();
         }
@@ -207,7 +224,7 @@ public class Assets {
             // if music was stopped previously, return to last location
             mediaPlayer.seekTo(mediaPosition);  // test
 
-            mediaPlayer.start();
+            //mediaPlayer.start();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -221,13 +238,10 @@ public class Assets {
     }
 
     // might need eventually
-    public static boolean resumeMusic() {
+    public static void resumeMusic() {
         if (mediaPlayer != null) {
             mediaPlayer.start();
-            return true;
         }
-        else
-            return false;
     }
 
     public static void stopMusic() {
@@ -244,6 +258,10 @@ public class Assets {
 
     public static void resetMusic() {
         mediaPosition = 0;
+    }
+
+    public static int getMusicPosition() {
+        return mediaPosition;
     }
 
     public static void updateVolumes(int vol) {

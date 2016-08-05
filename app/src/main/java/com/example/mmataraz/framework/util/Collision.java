@@ -1,5 +1,7 @@
 package com.example.mmataraz.framework.util;
 
+import android.util.Log;
+
 import com.example.mmataraz.game.model.Asteroid;
 import com.example.mmataraz.game.model.Player;
 
@@ -19,7 +21,7 @@ public class Collision {
 
         // get difference between velocity vectors
         playerVelocity = playerVelocity.set(p.getVelX(), p.getVelY());
-        asteroidVelocity = asteroidVelocity.set(/*-200*/Asteroid.getVelX(), 0);
+        asteroidVelocity = asteroidVelocity.set(Asteroid.getVelX(), 0);
         Vector2 velDiff = asteroidVelocity.sub(playerVelocity);
 
         // normalize collision vector
@@ -30,11 +32,14 @@ public class Collision {
 
         // get mass ratio
         float massRatio = 2.0f;
-        massRatio *= (a.getMass() / (p.getMass() + a.getMass()));
+        massRatio *= (a.getMass() / (float)(p.getMass() + a.getMass()));
 
         // get delta velocity vector for player
         // multiply cUV by massRatio*dotProduct
         Vector2 deltaV = cUV.mul(massRatio * dotProduct);
+
+        Log.d("delta X vel", String.valueOf(deltaV.x));
+        Log.d("delta Y vel", String.valueOf(deltaV.y));
         p.setVelX(p.getVelX() + deltaV.x);
         p.setVelY(p.getVelY() + deltaV.y);
     }
