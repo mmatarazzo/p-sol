@@ -10,6 +10,7 @@ import com.example.mmataraz.framework.animation.Animation;
 import com.example.mmataraz.framework.util.Painter;
 import com.example.mmataraz.framework.util.UIButton;
 import com.example.mmataraz.game.model.Asteroid;
+import com.example.mmataraz.game.model.Enemy;
 import com.example.mmataraz.game.model.Item;
 import com.example.mmataraz.game.model.Planet;
 import com.example.mmataraz.game.model.Star;
@@ -17,6 +18,7 @@ import com.example.mmataraz.game.model.Player;
 import com.example.mmataraz.projectsol.Assets;
 import com.example.mmataraz.projectsol.GameMainActivity;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
@@ -28,6 +30,7 @@ public class PlayState extends State {
     private ArrayList<Asteroid> asteroids;
     private Item dualLaser; //tbd
     private Player player;
+    private ArrayList<Enemy> enemies;
 
     // Background objects
     private ArrayList<Star> spaceDust;
@@ -48,6 +51,9 @@ public class PlayState extends State {
     private static final int PLAYER_HEIGHT = 32;
     private int playerScore = 0;
 
+    // Enemy properties
+    private int activeEnemy = 0;
+
     // Touch location
     private float recentTouchY;
     private float recentTouchX;
@@ -59,6 +65,7 @@ public class PlayState extends State {
 
     // Other current items
     private Animation currentAnim;
+    private Animation enemyAnim;
     private Bitmap planetImage;
     private String musicString;
     private PlayStateLevel currentLevel;
@@ -95,8 +102,8 @@ public class PlayState extends State {
 
         // Init Asteroids
         asteroids = new ArrayList<Asteroid>();
-        for (int i = 0; i < 8; i++) {
-            Asteroid a = new Asteroid((float) i*125, (float) GameMainActivity.GAME_HEIGHT,
+        for (int i = 0; i < /*8*/4; i++) {
+            Asteroid a = new Asteroid((float) i*/*125*/250, (float) GameMainActivity.GAME_HEIGHT,
                     ASTEROID_WIDTH, ASTEROID_HEIGHT);
             asteroids.add(a);
         }
@@ -107,6 +114,13 @@ public class PlayState extends State {
 
         // Init player
         player = new Player(256, 128, PLAYER_WIDTH, PLAYER_HEIGHT);
+
+        // Init enemies
+        enemies = new ArrayList<Enemy>();
+        for (int i=0; i<1; i++) {
+            Enemy e = new Enemy(GameMainActivity.GAME_WIDTH+128, -128, PLAYER_WIDTH, PLAYER_HEIGHT);
+            enemies.add(e);
+        }
 
         // Init spacedust
         spaceDust = new ArrayList<Star>();
@@ -125,6 +139,7 @@ public class PlayState extends State {
         // Init planet and animation
         planet = new Planet(32, GameMainActivity.GAME_HEIGHT/2 - planetImage.getHeight()/2);
         currentAnim = Assets.levelAnim;
+        enemyAnim = Assets.enemyAnim;
 
         pauseButton = new UIButton(672, 32, 720, 80, Assets.pause, Assets.pauseDown);
         quitButton = pauseButton;
@@ -178,7 +193,7 @@ public class PlayState extends State {
         }
 
         // Update game objects
-        playerScore += player.update(delta, asteroids);
+        playerScore += player.update(delta, asteroids, enemies);
         currentAnim.update(delta);
         updateDualLaser(delta);
         updateAsteroids(delta);
@@ -187,6 +202,14 @@ public class PlayState extends State {
         if (playerScore > 30 && asteroidSpeed > -280) {
             asteroidSpeed -= 10;
             Asteroid.setVelX(asteroidSpeed);
+        }
+
+        for (int i=0; i<enemies.size(); i++) {
+            Enemy e = enemies.get(i);
+            e.update(delta, asteroids);
+
+            if (i == activeEnemy && !e.getActive())
+                e.activateEnemy();
         }
 
         // Update timer
@@ -226,11 +249,24 @@ public class PlayState extends State {
         renderPlanet(g);
         renderSpaceDust(g);
         renderPlayer(g);
+
+        for (int i=0; i<enemies.size(); i++) {
+            Enemy e = enemies.get(i);
+            if (e.getActive() && e.isAlive())
+                renderEnemy(g);
+        }
+
         renderItems(g);
         renderAsteroids(g);
         renderScore(g);
         renderShield(g);
         //renderEnergy(g);
+
+        for (int i = 0; i < enemies.size(); i++) {
+            Enemy e = enemies.get(i);
+            if (e.isOnScreen())
+                renderEnemyShield(g, e);
+        }
 
         // If game is Paused, draw additional UI elements:
         if (gamePaused) {
@@ -274,6 +310,12 @@ public class PlayState extends State {
         currentAnim.render(g, (int) player.getX(), (int) player.getY(),
                 player.getWidth(), player.getHeight());
         player.renderWeapon(g);
+    }
+
+    private void renderEnemy(Painter g) {
+        enemyAnim.render(g, (int) enemies.get(0).getX(), (int) enemies.get(0).getY(),
+                enemies.get(0).getWidth(), enemies.get(0).getHeight());
+        enemies.get(0).renderWeapon(g);
     }
 
     private void renderItems(Painter g) {
@@ -328,6 +370,20 @@ public class PlayState extends State {
         g.fillRect(510, 30, 100, 1);
         g.fillRect(510, 15, 1, 15);
         g.fillRect(610, 15, 1, 15);
+    }
+
+    private void renderEnemyShield(Painter g, Enemy e) {
+        g.setFont(Typeface.DEFAULT_BOLD, 18);
+        g.setColor(/*Color.CYAN*/ Color.RED);
+
+        g.drawString("ENEMY: ", 600, 30);
+        g.fillRect(680, 15, e.getShield(), 15);
+
+        g.setColor(Color.WHITE);
+        g.fillRect(680, 15, 100, 1);
+        g.fillRect(680, 30, 100, 1);
+        g.fillRect(680, 15, 1, 15);
+        g.fillRect(780, 15, 1, 15);
     }
 
     @Override

@@ -74,6 +74,17 @@ public class Weapon {
         return false;
     }
 
+    public boolean onCollideEnemy() {
+        if (render) {
+            render = false;
+            //Assets.playSound(Assets.hitID);
+
+            return true;
+        }
+
+        return false;
+    }
+
     public float getX() {
         return x;
     }

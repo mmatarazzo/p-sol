@@ -24,8 +24,8 @@ public class Player {
     private boolean firing, dual, isAlive;
 
     // ship speed
-    private int maxVelY= 288; // >30 degrees of 400
-    private int maxVelX= 512;
+    private int maxVelY = 288; // >30 degrees of 400
+    private int maxVelX = 512;
 
     // weapon
     private static final int LASER_WIDTH = 8;
@@ -55,7 +55,7 @@ public class Player {
         dual = false;
     }
 
-    public int update(float delta, ArrayList<Asteroid> asteroids) {
+    public int update(float delta, ArrayList<Asteroid> asteroids, ArrayList<Enemy> enemies) {
         nextX = x + velX * delta;
         nextY = y + velY * delta;
 
@@ -79,7 +79,7 @@ public class Player {
 
         updateRects();
         updateEnergy();
-        return updateWeapon(delta, asteroids);
+        return updateWeapon(delta, asteroids, enemies);
     }
 
     public void updateRects() {
@@ -93,7 +93,7 @@ public class Player {
             energy++;
     }
 
-    private int updateWeapon(float delta, ArrayList<Asteroid> asteroids) {
+    private int updateWeapon(float delta, ArrayList<Asteroid> asteroids, ArrayList<Enemy> enemies) {
         int scoreUpdate = 0;
 
         for (int i = 0; i < lasers.size(); i++) {
@@ -142,6 +142,14 @@ public class Player {
                 if (Rect.intersects(w.getRect(),a.getRect())) {
                     if (w.onCollide(a))
                         scoreUpdate++;
+                }
+            }
+
+            for (int j = 0; j < enemies.size(); j++) {
+                Enemy e = enemies.get(j);
+                if (Rect.intersects(w.getRect(), e.getRect())) {
+                    if (w.onCollideEnemy())
+                        e.onLaserHit();
                 }
             }
         }

@@ -38,9 +38,11 @@ public class Assets {
     // Gameplay objects and background
     public static Bitmap earth, mars, asteroid;
     public static Bitmap level, upOne, upTwo, downOne, downTwo, laserItem;
+    public static Bitmap enemy;
 
     // Animation
     public static Animation levelAnim, upOneAnim, upTwoAnim, downOneAnim, downTwoAnim;
+    public static Animation enemyAnim;
 
     public static void loadMenuAssets() {
         // splash
@@ -73,6 +75,8 @@ public class Assets {
         downOne = loadBitmap("knight/knight-downone.png", true);
         downTwo = loadBitmap("knight/knight-downtwo.png", true);
         laserItem = loadBitmap("laser-upgrade.png", true);
+
+        enemy = loadBitmap("defender-level-enemy.png", true);
         // more bitmaps for ship and laser frames
 
         // animations
@@ -81,6 +85,8 @@ public class Assets {
         Frame up2 = new Frame(upTwo, .9f);
         Frame down1 = new Frame(downOne, .9f);
         Frame down2 = new Frame(downTwo, .9f);
+
+        Frame en = new Frame(enemy, .9f);
         // more frames here for ship, lasers and explosion
 
         levelAnim = new Animation(true, lvl);
@@ -88,6 +94,8 @@ public class Assets {
         upTwoAnim = new Animation(true, up2);
         downOneAnim = new Animation(true, down1);
         downTwoAnim = new Animation(true, down2);
+
+        enemyAnim = new Animation(true, en);
         // more animations for ship, lasers and explosion
     }
 
