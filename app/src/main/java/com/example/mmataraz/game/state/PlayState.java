@@ -208,6 +208,7 @@ public class PlayState extends State {
             Enemy e = enemies.get(i);
             e.update(delta, asteroids);
 
+            // going to change
             if (i == activeEnemy && !e.getActive())
                 e.activateEnemy();
         }

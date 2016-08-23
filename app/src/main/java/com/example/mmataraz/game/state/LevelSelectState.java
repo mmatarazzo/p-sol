@@ -31,7 +31,7 @@ public class LevelSelectState extends State {
 
     @Override
     public void onExit() {
-        Assets.unloadMenuAssets();
+        //Assets.unloadMenuAssets();
     }
 
     @Override
@@ -66,14 +66,16 @@ public class LevelSelectState extends State {
                 // Perform an action here!
                 Log.d("LevelSelectState", "Earth level selected!");
                 //currentLevel = PlayStateLevel.EARTH;
-                setCurrentState(new LoadState(this, new PlayState(PlayStateLevel.EARTH)));
+                setCurrentState(new LoadState(this, /*new PlayState(PlayStateLevel.EARTH)*/
+                        new BriefingState(PlayStateLevel.EARTH)));
 
                 // If score button is active and the release was within the score button:
             } else if (marsButton.isPressed(scaledX, scaledY)) {
                 marsButton.cancel();
                 Log.d("LevelSelectState", "Mars level selected!");
                 //currentLevel = PlayStateLevel.MARS;
-                setCurrentState(new LoadState(this, new PlayState(PlayStateLevel.MARS)));
+                setCurrentState(new LoadState(this, /*new PlayState(PlayStateLevel.MARS)*/
+                        new BriefingState(PlayStateLevel.MARS)));
             } else {
                 // Cancel all actions.
                 earthButton.cancel();

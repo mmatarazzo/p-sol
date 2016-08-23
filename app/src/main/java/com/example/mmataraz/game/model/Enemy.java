@@ -66,9 +66,15 @@ public class Enemy {
             emerge();
         else {
             // do cruise stuff
-            if (/*velX != 0*/ Math.abs(velY) > 2.0 )
+
+            if (/*velX != 0*/ Math.abs(velY) > 20.0 )
                 maneuver(-2, 0);
-            if (Math.abs(velX) > 2.0)
+            else if (Math.abs(velY) < -20.0)
+                maneuver(2, 0);
+
+            if (Math.abs(velX) > 20.0)
+                maneuver(0, -2);
+            else if (Math.abs(velX) < -20.0)
                 maneuver(0, 2);
         }
 
@@ -205,7 +211,7 @@ public class Enemy {
     }
 
     public void onLaserHit() {
-        x -= 1;
+        x += 1;
         Assets.playSound(Assets.hitID);
 
         shield -= 2;
