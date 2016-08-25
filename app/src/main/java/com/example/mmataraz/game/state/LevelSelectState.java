@@ -14,14 +14,16 @@ import com.example.mmataraz.projectsol.Assets;
  */
 public class LevelSelectState extends State {
 
-    private UIButton earthButton, marsButton;
+    private UIButton earthButton, marsButton, saturnButton;
 
     @Override
     public void init() {
-        earthButton = new UIButton(250, 50, 250 + Assets.earth.getWidth()/4,
-                50 + Assets.earth.getHeight()/4, Assets.earth, Assets.earth);
-        marsButton = new UIButton(250, 250, 250 + Assets.mars.getWidth()/4,
-                250 + Assets.mars.getHeight()/4, Assets.mars, Assets.mars);
+        earthButton = new UIButton(140, 40, 140 + Assets.earth.getWidth()/4,
+                40 + Assets.earth.getHeight()/4, Assets.earth, Assets.earth);
+        marsButton = new UIButton(140, 260, 140 + Assets.mars.getWidth()/4,
+                260 + Assets.mars.getHeight()/4, Assets.mars, Assets.mars);
+        saturnButton = new UIButton(460, 40, 460 + Assets.saturn.getWidth()/4,
+                40 + Assets.saturn.getHeight()/4, Assets.saturn, Assets.saturn);
     }
 
     @Override
@@ -44,11 +46,13 @@ public class LevelSelectState extends State {
 
         g.setColor(Color.WHITE);
         g.setFont(Typeface.DEFAULT_BOLD, 24);
-        g.drawString("EARTH:", 50, 50);
-        g.drawString("MARS:", 50, 250);
+        g.drawString("EARTH:", 40, 40);
+        g.drawString("MARS:", 40, 260);
+        g.drawString("SATURN:", 360, 40);
 
         earthButton.render(g);
         marsButton.render(g);
+        saturnButton.render(g);
     }
 
     @Override
@@ -56,6 +60,7 @@ public class LevelSelectState extends State {
         if (e.getAction() == MotionEvent.ACTION_DOWN) {
             earthButton.onTouchDown(scaledX, scaledY);
             marsButton.onTouchDown(scaledX, scaledY);
+            saturnButton.onTouchDown(scaledX, scaledY);
         }
 
         if (e.getAction() == MotionEvent.ACTION_UP) {
@@ -76,10 +81,15 @@ public class LevelSelectState extends State {
                 //currentLevel = PlayStateLevel.MARS;
                 setCurrentState(new LoadState(this, /*new PlayState(PlayStateLevel.MARS)*/
                         new BriefingState(PlayStateLevel.MARS)));
+            } else if (saturnButton.isPressed(scaledX, scaledY)) {
+                saturnButton.cancel();
+                Log.d("LevelSelectState", "Saturn level selected!");
+                setCurrentState(new LoadState(this, new BriefingState(PlayStateLevel.SATURN)));
             } else {
                 // Cancel all actions.
                 earthButton.cancel();
                 marsButton.cancel();
+                saturnButton.cancel();
             }
         }
 

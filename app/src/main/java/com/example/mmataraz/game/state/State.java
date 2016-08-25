@@ -10,7 +10,7 @@ import com.example.mmataraz.projectsol.GameMainActivity;
  */
 public abstract class State {
 
-    protected enum PlayStateLevel {EARTH, MARS}
+    protected enum PlayStateLevel {EARTH, MARS, SATURN}
 
     public void setCurrentState(State newState) {
         GameMainActivity.sGame.setCurrentState(newState);

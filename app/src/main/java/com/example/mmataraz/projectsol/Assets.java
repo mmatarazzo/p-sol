@@ -36,7 +36,7 @@ public class Assets {
     public static Bitmap welcome, begin, beginDown, options, optionsDown, pause, pauseDown;
 
     // Gameplay objects and background
-    public static Bitmap earth, mars, asteroid;
+    public static Bitmap earth, mars, saturn, asteroid;
     public static Bitmap level, upOne, upTwo, downOne, downTwo, laserItem;
     public static Bitmap enemy;
 
@@ -55,6 +55,7 @@ public class Assets {
         // level select
         earth = loadBitmap("earth-new.png", true);
         mars = loadBitmap("mars.png", true);
+        saturn = loadBitmap("saturn.png", true);
     }
 
     public static void loadPlayAssets() {
@@ -65,6 +66,8 @@ public class Assets {
         // gameplay objects and background
         //earth = loadBitmap("earth-new.png", true);    // a different backdrop would go here
         //mars = loadBitmap("mars.png", true);          // a different backdrop would go here
+        //saturn = loadBitmap("saturn.png", true);      // a different backdrop would go here
+
         asteroid = loadBitmap("asteroid-psol.png", false);
         // more bitmaps for asteroid frames
 
@@ -115,6 +118,7 @@ public class Assets {
         unloadBitmap(pauseDown);
         unloadBitmap(earth);
         unloadBitmap(mars);
+        unloadBitmap(saturn);
 
         unloadBitmap(asteroid);
         unloadBitmap(level);

@@ -67,14 +67,14 @@ public class Enemy {
         else {
             // do cruise stuff
 
-            if (/*velX != 0*/ Math.abs(velY) > 20.0 )
+            if (/*velX != 0*/ Math.abs(velY) > 10.0 )
                 maneuver(-2, 0);
-            else if (Math.abs(velY) < -20.0)
+            else if (Math.abs(velY) < -10.0)
                 maneuver(2, 0);
 
-            if (Math.abs(velX) > 20.0)
+            if (Math.abs(velX) > 10.0)
                 maneuver(0, -2);
-            else if (Math.abs(velX) < -20.0)
+            else if (Math.abs(velX) < -10.0)
                 maneuver(0, 2);
         }
 

@@ -94,6 +94,11 @@ public class PlayState extends State {
                 musicString = "mars-projsol-07.wav";
                 break;
 
+            case SATURN:
+                planetImage = Assets.saturn;
+                musicString = "saturn-projsol-02.wav";
+                break;
+
             default:
                 planetImage = Assets.earth;
                 musicString = "earth-projsol-23.wav";
