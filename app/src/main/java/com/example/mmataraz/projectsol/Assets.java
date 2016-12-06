@@ -25,81 +25,125 @@ public class Assets {
 
     // Sound effects
     private static SoundPool soundPool;
+    public static int launchID, engineID;
     public static int hitID, fireID, destroyID;
-    private static float fxVolume = 0.75f;
+    private static float fxVolume = 0.5f;
 
     // Music
     private static MediaPlayer mediaPlayer;
     private static int mediaPosition = 0;
 
-    // Welcome, menu options and pause button
+    // Splash screen and pause button bitmaps
     public static Bitmap welcome, begin, beginDown, options, optionsDown, pause, pauseDown;
 
-    // Gameplay objects and background
-    public static Bitmap earth, mars, saturn, asteroid;
-    public static Bitmap level, upOne, upTwo, downOne, downTwo, laserItem;
-    public static Bitmap enemy;
+    // Planet, ship and object bitmaps
+    public static Bitmap earth, mars, saturn;
+    public static Bitmap playerLevel, playerUpOne, playerUpTwo, playerDownOne, playerDownTwo;
+    public static Bitmap wingmanLevel, wingmanUpOne, wingmanUpTwo, wingmanDownOne, wingmanDownTwo;
+    public static Bitmap enemyLevel, enemyUpOne, enemyUpTwo, enemyDownOne, enemyDownTwo;
+    public static Bitmap asteroid, laserItem;
 
-    // Animation
-    public static Animation levelAnim, upOneAnim, upTwoAnim, downOneAnim, downTwoAnim;
-    public static Animation enemyAnim;
+    // Animations
+    public static Animation playerLevelAnim, playerUpOneAnim, playerUpTwoAnim, playerDownOneAnim, playerDownTwoAnim;
+    public static Animation wingmanLevelAnim, wingmanUpOneAnim, wingmanUpTwoAnim, wingmanDownOneAnim, wingmanDownTwoAnim;
+    public static Animation enemyLevelAnim, enemyUpOneAnim, enemyUpTwoAnim, enemyDownOneAnim, enemyDownTwoAnim;
 
     public static void loadMenuAssets() {
-        // splash
+        // splash screen bitmaps
         welcome = loadBitmap("welcome.png", false);
         begin = loadBitmap("begin_button.png", true);
         beginDown = loadBitmap("begin_button_down.png", true);
         options = loadBitmap("options_button.png", true);
         optionsDown = loadBitmap("options_button_down.png", true);
 
-        // level select
+        // level select bitmaps
         earth = loadBitmap("earth-new.png", true);
         mars = loadBitmap("mars.png", true);
         saturn = loadBitmap("saturn.png", true);
     }
 
     public static void loadPlayAssets() {
-        // pause button
+        // pause button bitmaps
         pause = loadBitmap("pause_button.png", true);
         pauseDown = loadBitmap("pause_button_down.png", true);
 
-        // gameplay objects and background
+        // object bitmaps
+        asteroid = loadBitmap("asteroid-psol.png", false);
+        // more bitmaps for future asteroid frames
+        laserItem = loadBitmap("laser-upgrade.png", true);
+
         //earth = loadBitmap("earth-new.png", true);    // a different backdrop would go here
         //mars = loadBitmap("mars.png", true);          // a different backdrop would go here
         //saturn = loadBitmap("saturn.png", true);      // a different backdrop would go here
 
-        asteroid = loadBitmap("asteroid-psol.png", false);
-        // more bitmaps for asteroid frames
+        // player ship bitmaps
+        playerLevel = loadBitmap("knight/knight-level.png", true);
+        playerUpOne = loadBitmap("knight/knight-upone.png", true);
+        playerUpTwo = loadBitmap("knight/knight-uptwo.png", true);
+        playerDownOne = loadBitmap("knight/knight-downone.png", true);
+        playerDownTwo = loadBitmap("knight/knight-downtwo.png", true);
 
-        // ship and lasers
-        level = loadBitmap("knight/knight-level.png", true);
-        upOne = loadBitmap("knight/knight-upone.png", true);
-        upTwo = loadBitmap("knight/knight-uptwo.png", true);
-        downOne = loadBitmap("knight/knight-downone.png", true);
-        downTwo = loadBitmap("knight/knight-downtwo.png", true);
-        laserItem = loadBitmap("laser-upgrade.png", true);
+        // wingman ship bitmaps
+        wingmanLevel = loadBitmap("arwing/arwing-straight.png", true);
+        wingmanUpOne = loadBitmap("arwing/arwing-leftOne.png", true);
+        wingmanUpTwo = loadBitmap("arwing/arwing-leftTwo.png", true);
+        wingmanDownOne = loadBitmap("arwing/arwing-rightOne.png", true);
+        wingmanDownTwo = loadBitmap("arwing/arwing-rightTwo.png", true);
 
-        enemy = loadBitmap("defender-level-enemy.png", true);
-        // more bitmaps for ship and laser frames
+        // enemy ship bitmaps
+        enemyLevel = loadBitmap("defender/defender-level-enemy.png", true);
+        enemyUpOne = loadBitmap("defender/defender-upOne-enemy.png", true);
+        enemyUpTwo = loadBitmap("defender/defender-upTwo-enemy.png", true);
+        enemyDownOne = loadBitmap("defender/defender-downOne-enemy.png", true);
+        enemyDownTwo = loadBitmap("defender/defender-downTwo-enemy.png", true);
 
-        // animations
-        Frame lvl = new Frame(level, .9f);
-        Frame up1 = new Frame(upOne, .9f);
-        Frame up2 = new Frame(upTwo, .9f);
-        Frame down1 = new Frame(downOne, .9f);
-        Frame down2 = new Frame(downTwo, .9f);
+        // more bitmaps for other ships, lasers, explosions etc..
 
-        Frame en = new Frame(enemy, .9f);
-        // more frames here for ship, lasers and explosion
+        // player ship frames
+        Frame playerLvl = new Frame(playerLevel, .9f);
+        Frame playerUp1 = new Frame(playerUpOne, .9f);
+        Frame playerUp2 = new Frame(playerUpTwo, .9f);
+        Frame playerDn1 = new Frame(playerDownOne, .9f);
+        Frame playerDn2 = new Frame(playerDownTwo, .9f);
 
-        levelAnim = new Animation(true, lvl);
-        upOneAnim = new Animation(true, up1);
-        upTwoAnim = new Animation(true, up2);
-        downOneAnim = new Animation(true, down1);
-        downTwoAnim = new Animation(true, down2);
+        // wingman ship frames
+        Frame wingmanLvl = new Frame(wingmanLevel, .9f);
+        Frame wingmanUp1 = new Frame(wingmanUpOne, .9f);
+        Frame wingmanUp2 = new Frame(wingmanUpTwo, .9f);
+        Frame wingmanDn1 = new Frame(wingmanDownOne, .9f);
+        Frame wingmanDn2 = new Frame(wingmanDownTwo, .9f);
 
-        enemyAnim = new Animation(true, en);
-        // more animations for ship, lasers and explosion
+        // enemy ship frames
+        Frame enemyLvl = new Frame(enemyLevel, .9f);
+        Frame enemyUp1 = new Frame(enemyUpOne, .9f);
+        Frame enemyUp2 = new Frame(enemyUpTwo, .9f);
+        Frame enemyDn1 = new Frame(enemyDownOne, .9f);
+        Frame enemyDn2 = new Frame(enemyDownTwo, .9f);
+
+        // more frames for other ships, lasers, explosions etc..
+
+        // player ship animations
+        playerLevelAnim = new Animation(true, playerLvl);
+        playerUpOneAnim = new Animation(true, playerUp1);
+        playerUpTwoAnim = new Animation(true, playerUp2);
+        playerDownOneAnim = new Animation(true, playerDn1);
+        playerDownTwoAnim = new Animation(true, playerDn2);
+
+        // wingman ship animations
+        wingmanLevelAnim = new Animation(true, wingmanLvl);
+        wingmanUpOneAnim = new Animation(true, wingmanUp1);
+        wingmanUpTwoAnim = new Animation(true, wingmanUp2);
+        wingmanDownOneAnim = new Animation(true, wingmanDn1);
+        wingmanDownTwoAnim = new Animation(true, wingmanDn2);
+
+        // enemy ship animations
+        enemyLevelAnim = new Animation(true, enemyLvl);
+        enemyUpOneAnim = new Animation(true, enemyUp1);
+        enemyUpTwoAnim = new Animation(true, enemyUp2);
+        enemyDownOneAnim = new Animation(true, enemyDn1);
+        enemyDownTwoAnim = new Animation(true, enemyDn2);
+
+        // more animations for other ships, lasers, explosions etc..
     }
 
     public static void unloadMenuAssets() {
@@ -113,27 +157,43 @@ public class Assets {
 
     public static void unloadPlayAssets() {
         // unload play state assets
-        unloadBitmap(welcome);
+        unloadBitmap(welcome);  // also game over screen
         unloadBitmap(pause);
         unloadBitmap(pauseDown);
+
         unloadBitmap(earth);
         unloadBitmap(mars);
         unloadBitmap(saturn);
 
         unloadBitmap(asteroid);
-        unloadBitmap(level);
-        unloadBitmap(upOne);
-        unloadBitmap(upTwo);
-        unloadBitmap(downOne);
-        unloadBitmap(downTwo);
         unloadBitmap(laserItem);
+
+        unloadBitmap(playerLevel);
+        unloadBitmap(playerUpOne);
+        unloadBitmap(playerUpTwo);
+        unloadBitmap(playerDownOne);
+        unloadBitmap(playerDownTwo);
+
+        unloadBitmap(wingmanLevel);
+        unloadBitmap(wingmanUpOne);
+        unloadBitmap(wingmanUpTwo);
+        unloadBitmap(wingmanDownOne);
+        unloadBitmap(wingmanDownTwo);
+
+        unloadBitmap(enemyLevel);
+        unloadBitmap(enemyUpOne);
+        unloadBitmap(enemyUpTwo);
+        unloadBitmap(enemyDownOne);
+        unloadBitmap(enemyDownTwo);
     }
 
     public static void onResume() {
         // load sounds
         hitID = loadSound("hit.wav");
-        fireID = loadSound("laser2.wav");
+        fireID = loadSound("laser-03.wav");
         destroyID = loadSound("explode.wav");
+        launchID = loadSound("launch-02.wav");
+        engineID = loadSound("engines-hum-02.wav");
 
         // load multi-state bitmaps
         //welcome = loadBitmap("welcome.png", false);
@@ -215,9 +275,28 @@ public class Assets {
         return soundPool;
     }
 
-    public static void playSound(int soundID) {
+    public static int playSound(int soundID, int loop) {
         if (soundPool != null) {
-            soundPool.play(soundID, fxVolume, fxVolume, 1, 0, 1);
+            return soundPool.play(soundID, fxVolume, fxVolume, 1, loop, 1);
+        }
+
+        return 0;
+    }
+    public static void pauseSound(int streamID) {
+        if (soundPool != null) {
+            soundPool.pause(streamID);
+        }
+    }
+
+    public static void resumeSound(int streamID) {
+        if (soundPool != null) {
+            soundPool.resume(streamID);
+        }
+    }
+
+    public static void stopSound(int streamID) {
+        if (soundPool != null) {
+            soundPool.stop(streamID);
         }
     }
 

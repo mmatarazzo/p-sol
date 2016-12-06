@@ -41,7 +41,7 @@ public class Star {
         if (x <= -4) {
             // Reset to the right
             x += (GameMainActivity.GAME_WIDTH + 4);
-            y = RandomNumberGenerator.getRandIntBetween(4, GameMainActivity.GAME_HEIGHT - 4);
+            //y = RandomNumberGenerator.getRandIntBetween(4, GameMainActivity.GAME_HEIGHT - 4);
         }
     }
 

@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.util.Log;
 import android.view.MotionEvent;
 
 import com.example.mmataraz.framework.animation.Animation;
@@ -18,7 +19,6 @@ import com.example.mmataraz.game.model.Player;
 import com.example.mmataraz.projectsol.Assets;
 import com.example.mmataraz.projectsol.GameMainActivity;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
@@ -29,7 +29,7 @@ public class PlayState extends State {
     // Game objects
     private ArrayList<Asteroid> asteroids;
     private Item dualLaser; //tbd
-    private Player player;
+    private Player player, wingman;
     private ArrayList<Enemy> enemies;
 
     // Background objects
@@ -52,6 +52,7 @@ public class PlayState extends State {
     private int playerScore = 0;
 
     // Enemy properties
+    private static final int NUM_ENEMIES = 4;
     private int activeEnemy = 0;
 
     // Touch location
@@ -64,12 +65,15 @@ public class PlayState extends State {
     private String pausedString = "Game paused. Tap to resume.";
 
     // Other current items
-    private Animation currentAnim;
-    private Animation enemyAnim;
+    private Animation playerCurrentAnim, wingmanCurrentAnim, enemyCurrentAnim;
     private Bitmap planetImage;
     private String musicString;
     private PlayStateLevel currentLevel;
     private int timer = 0;
+
+    // Sound stream IDs
+    private static int launchStreamID;
+    private static int engineStreamID;
 
     // Change to UI buttons
     private UIButton pauseButton, quitButton;
@@ -86,24 +90,32 @@ public class PlayState extends State {
         switch (currentLevel) {
             case EARTH:
                 planetImage = Assets.earth;
-                musicString = "earth-projsol-23.wav";
+                musicString = "earth-projsol-26.wav";
                 break;
 
             case MARS:
                 planetImage = Assets.mars;
-                musicString = "mars-projsol-07.wav";
+                musicString = "mars-projsol-08.wav";
                 break;
 
             case SATURN:
                 planetImage = Assets.saturn;
-                musicString = "saturn-projsol-02.wav";
+                musicString = "saturn-projsol-03.wav";
                 break;
 
             default:
                 planetImage = Assets.earth;
-                musicString = "earth-projsol-23.wav";
+                musicString = "earth-projsol-26.wav";
                 break;
         }
+
+        // Load and play music
+        Assets.resetMusic();
+        Assets.loadMusic(musicString, true);
+        Assets.resumeMusic();
+
+        launchStreamID = Assets.playSound(Assets.launchID, 0);
+        engineStreamID = Assets.playSound(Assets.engineID, -1);
 
         // Init Asteroids
         asteroids = new ArrayList<Asteroid>();
@@ -119,11 +131,13 @@ public class PlayState extends State {
 
         // Init player
         player = new Player(256, 128, PLAYER_WIDTH, PLAYER_HEIGHT);
+        wingman = new Player(192, 192, PLAYER_WIDTH, PLAYER_HEIGHT);
 
         // Init enemies
         enemies = new ArrayList<Enemy>();
-        for (int i=0; i<1; i++) {
-            Enemy e = new Enemy(GameMainActivity.GAME_WIDTH+128, -128, PLAYER_WIDTH, PLAYER_HEIGHT);
+        for (int i=0; i<NUM_ENEMIES; i++) {
+            // emerge from top left
+            Enemy e = new Enemy(/*GameMainActivity.GAME_WIDTH+*/-128, -128, PLAYER_WIDTH, PLAYER_HEIGHT);
             enemies.add(e);
         }
 
@@ -143,18 +157,14 @@ public class PlayState extends State {
 
         // Init planet and animation
         planet = new Planet(32, GameMainActivity.GAME_HEIGHT/2 - planetImage.getHeight()/2);
-        currentAnim = Assets.levelAnim;
-        enemyAnim = Assets.enemyAnim;
+        playerCurrentAnim = Assets.playerLevelAnim;
+        wingmanCurrentAnim = Assets.wingmanLevelAnim;
+        enemyCurrentAnim = Assets.enemyLevelAnim;
 
         pauseButton = new UIButton(672, 32, 720, 80, Assets.pause, Assets.pauseDown);
         quitButton = pauseButton;
         pauseRect = new Rect(672, 32, 720, 80);
         quitRect = pauseRect;
-
-        // Load and play music
-        Assets.resetMusic();
-        Assets.loadMusic(musicString, true);
-        Assets.resumeMusic();
     }
 
     @Override
@@ -171,6 +181,8 @@ public class PlayState extends State {
     public void update(float delta) {
         // Check this first b/c quit button just sets isAlive to false
         if (!player.isAlive()) {
+            Assets.stopSound(engineStreamID);
+            Assets.stopSound(launchStreamID);
             Assets.stopMusic();
             setCurrentState(new LoadState(this, new GameOverState(playerScore)));
         }
@@ -199,9 +211,12 @@ public class PlayState extends State {
 
         // Update game objects
         playerScore += player.update(delta, asteroids, enemies);
-        currentAnim.update(delta);
+        playerCurrentAnim.update(delta);
         updateDualLaser(delta);
         updateAsteroids(delta);
+
+        int test = wingman.update(delta, asteroids, enemies);
+        wingmanCurrentAnim.update(delta);
 
         // Increase asteroid speed when score exceeds 30
         if (playerScore > 30 && asteroidSpeed > -280) {
@@ -209,13 +224,33 @@ public class PlayState extends State {
             Asteroid.setVelX(asteroidSpeed);
         }
 
-        for (int i=0; i<enemies.size(); i++) {
-            Enemy e = enemies.get(i);
-            e.update(delta, asteroids);
+        //for (int i = 0; i < enemies.size(); i++) {
+        if (activeEnemy < enemies.size()) {
+            Enemy e = enemies.get(activeEnemy);
+            e.update(delta, asteroids, player, wingman);
 
             // going to change
-            if (i == activeEnemy && !e.getActive())
-                e.activateEnemy();
+            if (!e.getActive())
+                e.setActive(true);
+                //e.activateEnemy();
+
+            if (!e.isAlive() && /*e.getActive()*/ !e.isOnScreen()) {
+                //e.deactivateEnemy();
+                e.setActive(false);
+                activeEnemy++;
+            }
+
+            // update animation
+            if (Math.abs(e.getVelY()) <= 70)
+                enemyCurrentAnim = Assets.enemyLevelAnim;
+            else if (e.getVelY() > 70 && e.getVelY() <= 145)
+                enemyCurrentAnim = Assets.enemyDownOneAnim;
+            else if (e.getVelY() > 145)
+                enemyCurrentAnim = Assets.enemyDownTwoAnim;
+            else if (e.getVelY() < -70 && e.getVelY() >= -145)
+                enemyCurrentAnim = Assets.enemyUpOneAnim;
+            else if (e.getVelY() < -145)
+                enemyCurrentAnim = Assets.enemyUpTwoAnim;
         }
 
         // Update timer
@@ -255,10 +290,11 @@ public class PlayState extends State {
         renderPlanet(g);
         renderSpaceDust(g);
         renderPlayer(g);
+        renderWingman(g);
 
-        for (int i=0; i<enemies.size(); i++) {
+        for (int i = 0; i < enemies.size(); i++) {
             Enemy e = enemies.get(i);
-            if (e.getActive() && e.isAlive())
+            if (e.getActive() && e.isAlive())   // eventually, don't need e.isAlive()
                 renderEnemy(g);
         }
 
@@ -270,7 +306,7 @@ public class PlayState extends State {
 
         for (int i = 0; i < enemies.size(); i++) {
             Enemy e = enemies.get(i);
-            if (e.isOnScreen())
+            if (e.isOnScreen() && e.isAlive())
                 renderEnemyShield(g, e);
         }
 
@@ -313,15 +349,21 @@ public class PlayState extends State {
     }
 
     private void renderPlayer(Painter g) {
-        currentAnim.render(g, (int) player.getX(), (int) player.getY(),
+        playerCurrentAnim.render(g, (int) player.getX(), (int) player.getY(),
                 player.getWidth(), player.getHeight());
         player.renderWeapon(g);
     }
 
+    private void renderWingman(Painter g) {
+        wingmanCurrentAnim.render(g, (int) wingman.getX(), (int) wingman.getY(),
+                wingman.getWidth(), wingman.getHeight());
+        wingman.renderWeapon(g);
+    }
+
     private void renderEnemy(Painter g) {
-        enemyAnim.render(g, (int) enemies.get(0).getX(), (int) enemies.get(0).getY(),
-                enemies.get(0).getWidth(), enemies.get(0).getHeight());
-        enemies.get(0).renderWeapon(g);
+        enemyCurrentAnim.render(g, (int) enemies.get(activeEnemy).getX(), (int) enemies.get(activeEnemy).getY(),
+                enemies.get(activeEnemy).getWidth(), enemies.get(activeEnemy).getHeight());
+        enemies.get(activeEnemy).renderWeapon(g);
     }
 
     private void renderItems(Painter g) {
@@ -351,16 +393,24 @@ public class PlayState extends State {
 
     private void renderShield(Painter g) {
         g.setFont(Typeface.DEFAULT_BOLD, 18);
-        g.setColor(/*Color.CYAN*/ Color.BLUE);
 
+        g.setColor(/*Color.CYAN*/ Color.BLUE);
         g.drawString("SHIELD: ", 200, 30);
         g.fillRect(280, 15, player.getShield(), 15);
-
         g.setColor(Color.WHITE);
         g.fillRect(280, 15, 100, 1);
         g.fillRect(280, 30, 100, 1);
         g.fillRect(280, 15, 1, 15);
         g.fillRect(380, 15, 1, 15);
+
+        g.setColor(Color.CYAN);
+        g.drawString("WINGMAN: ", 170, 55);
+        g.fillRect(280, 40, wingman.getShield(), 15);
+        g.setColor(Color.WHITE);
+        g.fillRect(280, 40, 100, 1);
+        g.fillRect(280, 55, 100, 1);
+        g.fillRect(280, 40, 1, 15);
+        g.fillRect(380, 40, 1, 15);
     }
 
     private void renderEnergy(Painter g) {
@@ -447,19 +497,34 @@ public class PlayState extends State {
             // between touches to change velocity, not just position..
             int deltaY = scaledY - (int) recentTouchY;
             int deltaX = scaledX - (int) recentTouchX;
+
             player.maneuver(deltaY, deltaX);
+            wingman.maneuver(deltaY, deltaX);   // let's see
+            //Log.d("dY", Integer.toString(deltaY));
+            //Log.d("dX", Integer.toString(deltaX));
 
             // Change sprite (animation) based on Y velocity to give the appearance of movement
             if (Math.abs(player.getVelY()) <= /*8*/ 70)
-                currentAnim = Assets.levelAnim;
+                playerCurrentAnim = Assets.playerLevelAnim;
             else if (player.getVelY() > /*8*/ 70 && player.getVelY() <= /*32*/ 145)
-                currentAnim = Assets.downOneAnim;
+                playerCurrentAnim = Assets.playerDownOneAnim;
             else if (player.getVelY() > /*32*/ 145)
-                currentAnim = Assets.downTwoAnim;
+                playerCurrentAnim = Assets.playerDownTwoAnim;
             else if (player.getVelY() < /*-8*/ -70 && player.getVelY() >= /*-32*/ -145)
-                currentAnim = Assets.upOneAnim;
+                playerCurrentAnim = Assets.playerUpOneAnim;
             else if (player.getVelY() < /*-32*/ -145)
-                currentAnim = Assets.upTwoAnim;
+                playerCurrentAnim = Assets.playerUpTwoAnim;
+
+            if (Math.abs(wingman.getVelY()) <= 70)
+                wingmanCurrentAnim = Assets.wingmanLevelAnim;
+            else if (wingman.getVelY() > 70 && wingman.getVelY() <= 145)
+                wingmanCurrentAnim = Assets.wingmanDownOneAnim;
+            else if (wingman.getVelY() > 145)
+                wingmanCurrentAnim = Assets.wingmanDownTwoAnim;
+            else if (wingman.getVelY() < -70 && wingman.getVelY() >= -145)
+                wingmanCurrentAnim = Assets.wingmanUpOneAnim;
+            else if (wingman.getVelY() < -145)
+                wingmanCurrentAnim = Assets.wingmanUpTwoAnim;
 
             recentTouchY = scaledY;
             recentTouchX = scaledX;
@@ -489,6 +554,8 @@ public class PlayState extends State {
                 // Must cancel pauseButton before onTouch() method returns.
                 pauseButton.cancel();
                 Assets.resumeMusic();
+                Assets.resumeSound(launchStreamID);
+                Assets.resumeSound(engineStreamID);
 
                 return true;
             }
@@ -496,8 +563,11 @@ public class PlayState extends State {
             // If Touch Up triggers PauseButton, pause the game.
             if (pauseButton.isPressed(scaledX, scaledY)) {
                 pauseButton.cancel();
+                Assets.pauseSound(engineStreamID);
+                Assets.pauseSound(launchStreamID);
                 Assets.pauseMusic();
                 gamePaused = true;
+
                 return true;
             } else if (pauseButton.wasHit()) {
                 // If pause button was pressed but user moved off it, return and don't pause game
@@ -527,6 +597,8 @@ public class PlayState extends State {
     // Called when Activity is pausing.
     @Override
     public void onPause() {
+        Assets.stopSound(engineStreamID);
+        Assets.stopSound(launchStreamID);
         Assets.stopMusic();
         gamePaused = true;
     }
@@ -534,6 +606,7 @@ public class PlayState extends State {
     @Override
     public void onResume() {
         Assets.loadMusic(musicString, true);
+        Assets.playSound(Assets.engineID, -1);
     }
 
 }

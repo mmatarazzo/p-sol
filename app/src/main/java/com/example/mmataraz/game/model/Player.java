@@ -28,9 +28,13 @@ public class Player {
     private int maxVelX = 512;
 
     // weapon
-    private static final int LASER_WIDTH = 8;
+    //private static final int LASER_WIDTH = 8;
+    private static final int LASER_WIDTH = 16;
     private static final int LASER_HEIGHT = 1;
+    private static final int LASER_SPACING = 3;
     private int weaponEnergy = 20;
+    private int laserTotalWidth = LASER_WIDTH * LASER_SPACING;
+    private int laserSegmentRemainder = 3 - (GameMainActivity.GAME_WIDTH % laserTotalWidth) / LASER_WIDTH;
 
     private int mass = 100;
 
@@ -46,8 +50,9 @@ public class Player {
         isAlive = true;
 
         lasers = new ArrayList<Weapon>();
-        for (int i = 0; i <= GameMainActivity.GAME_WIDTH; i += (LASER_WIDTH * 3)) {
-            Weapon w = new Weapon(i, y, LASER_WIDTH, LASER_HEIGHT);
+        //for (int i = 0; i < GameMainActivity.GAME_WIDTH; i += (LASER_WIDTH * 2)) {
+        for (int i = 0; i <= GameMainActivity.GAME_WIDTH; i += (/*LASER_WIDTH * LASER_SPACING*/ laserTotalWidth)) {
+            Weapon w = new Weapon(i, y, LASER_WIDTH, LASER_HEIGHT, laserSegmentRemainder);
             lasers.add(w);
         }
 
@@ -98,13 +103,14 @@ public class Player {
 
         for (int i = 0; i < lasers.size(); i++) {
             Weapon w = lasers.get(i);
-            w.update(delta);
+            w.update(delta, 1);
 
             // update rects must go after the next section because yPos is changing
 
             // LASER START - needs some adjustment?
             if (energy >= weaponEnergy && firing && !w.getRender()) {
-                if ((int) w.getX() >= x + width - 1 && (int) w.getX() <= x + width + 11) {
+                //if ((int) w.getX() >= x + width - 1 && (int) w.getX() <= x + width + 11) {
+                if ((int) w.getX() >= x + width - 4 && (int) w.getX() < x + width + 8) {
                     if (Math.abs(velY) <= 70) {
                         w.setVelY(0);
                         w.setY(y + height / 2);
@@ -128,7 +134,7 @@ public class Player {
 
                     w.setRender(true);
                     energy -= weaponEnergy;
-                    Assets.playSound(Assets.fireID);
+                    Assets.playSound(Assets.fireID, 0);
                 }
             }
 
@@ -147,9 +153,11 @@ public class Player {
 
             for (int j = 0; j < enemies.size(); j++) {
                 Enemy e = enemies.get(j);
-                if (Rect.intersects(w.getRect(), e.getRect())) {
-                    if (w.onCollideEnemy())
-                        e.onLaserHit();
+                if (e.getActive() && e.isOnScreen()) {    // only check the active enemy
+                    if (Rect.intersects(w.getRect(), e.getRect())) {
+                        if (w.onCollideShip() /*&& e.isOnScreen()*/)
+                            e.onLaserHit();
+                    }
                 }
             }
         }
@@ -176,7 +184,7 @@ public class Player {
 
     public void pushBack(int dX) {
         x -= dX;
-        Assets.playSound(Assets.hitID);
+        Assets.playSound(Assets.hitID, 0);
 
         if (x < -width / 2) {
             isAlive = false;
@@ -186,6 +194,25 @@ public class Player {
         if (shield < 1) {
             isAlive = false;
         }
+
+        updateRects();
+    }
+
+    public void onLaserHit() {
+        x -= 1;
+        Assets.playSound(Assets.hitID, 0);
+
+        if (x < -width / 2) {
+            isAlive = false;
+        }
+
+        //if (isAlive)
+        //{
+            shield -= 2;
+            if (shield < 1) {
+                isAlive = false;
+            }
+        //}
 
         updateRects();
     }

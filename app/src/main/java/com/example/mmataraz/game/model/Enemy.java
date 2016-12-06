@@ -2,8 +2,10 @@ package com.example.mmataraz.game.model;
 
 import android.graphics.Color;
 import android.graphics.Rect;
+import android.util.Log;
 
 import com.example.mmataraz.framework.util.Painter;
+import com.example.mmataraz.framework.util.RandomNumberGenerator;
 import com.example.mmataraz.projectsol.Assets;
 import com.example.mmataraz.projectsol.GameMainActivity;
 
@@ -14,6 +16,8 @@ import java.util.ArrayList;
  */
 public class Enemy {
 
+    private enum MovementType {VERTICAL, HORIZONTAL, BOTH}
+
     private float x, y, nextX, nextY;
     private int width, height;
     private int velX, velY, nextVelX, nextVelY;  // new
@@ -21,7 +25,8 @@ public class Enemy {
     private Rect rect;
 
     private ArrayList<Weapon> lasers;
-    private boolean firing, dual, isAlive, onScreen;
+    private boolean firing, dual, isAlive, onScreen, active, evade;
+    private int evadeCounterX, evadeCounterY, firingCounter;
 
     // ship speed
     private int maxVelY = 256;
@@ -30,9 +35,15 @@ public class Enemy {
     // weapon
     private static final int LASER_WIDTH = 8;
     private static final int LASER_HEIGHT = 1;
+    private static final int LASER_SPACING = 3;
     private int weaponEnergy = 20;
+    private int laserTotalWidth = LASER_WIDTH * LASER_SPACING;
+    private int laserSegmentRemainder = 3 - (GameMainActivity.GAME_WIDTH % laserTotalWidth) / LASER_WIDTH;
 
     private int mass = 100;
+
+    private int randInt, randInt2;
+    private MovementType movementType;
 
     public Enemy(float x, float y, int width, int height) {
         this.x = x;
@@ -43,50 +54,146 @@ public class Enemy {
         shield = 100;
         energy = 800;
         rect = new Rect();
-        //isAlive = true;
-        isAlive = false;
+        isAlive = true;
         onScreen = false;
+        active = false; //try
+        evade = false;  //try
+        evadeCounterX = 0;
+        evadeCounterY = 0;
+        firingCounter = 0;
 
         lasers = new ArrayList<Weapon>();
-        for (int i = 0; i <= GameMainActivity.GAME_WIDTH; i += (LASER_WIDTH * 3)) {
-            Weapon w = new Weapon(i, y, LASER_WIDTH, LASER_HEIGHT);
+        //for (int i = 0; i <= GameMainActivity.GAME_WIDTH; i += (LASER_WIDTH * 3)) {
+        for (int i = GameMainActivity.GAME_WIDTH; i >= 0; i -= (LASER_WIDTH * 3)) {
+            Weapon w = new Weapon(i, y, -LASER_WIDTH, LASER_HEIGHT, laserSegmentRemainder);
             lasers.add(w);
         }
 
         firing = false;
         dual = false;
+
+        randInt = 0;
+        randInt2 = 0;
+        movementType = MovementType.VERTICAL;
     }
 
-    public void update(float delta, ArrayList<Asteroid> asteroids) {
+    public void update(float delta, ArrayList<Asteroid> asteroids, Player player, Player wingman) {
 
-        if (!isAlive)
+        if (!active)
             return;
 
-        if (!onScreen)
+        if (!onScreen && isAlive) {
             emerge();
-        else {
+            if (x < 750 && y > 100)
+                onScreen = true;
+        }
+        else if (onScreen && isAlive) {
             // do cruise stuff
+            //Log.d("velX", Integer.toString(velX));
+            //Log.d("velY", Integer.toString(velY));
 
-            if (/*velX != 0*/ Math.abs(velY) > 10.0 )
-                maneuver(-2, 0);
-            else if (Math.abs(velY) < -10.0)
-                maneuver(2, 0);
+            if (!evade) {
+                if (velY > 8) {
+                    maneuver(-2, 0);
+                    // fire
+                } else if (velY < -8) {
+                    maneuver(2, 0);
+                    // fire
+                } else {
+                    int next = velY > 0 ? -1 : 1;
+                    maneuver(next, 0);
+                    // no fire
+                }
 
-            if (Math.abs(velX) > 10.0)
-                maneuver(0, -2);
-            else if (Math.abs(velX) < -10.0)
-                maneuver(0, 2);
+                if (velX > 8) {
+                    maneuver(0, -2);
+                    // fire
+                } else if (velX < -8) {
+                    maneuver(0, 2);
+                    // fire
+                } else {
+                    int next = velX > 0 ? -1 : 1;
+                    maneuver(0, next);
+                    // no fire
+                }
+
+                if (firing) {
+                    if (firingCounter > 30) {
+                        firing = false;
+                        firingCounter = 0;
+                    }
+                    else
+                        firingCounter++;
+                }
+
+                randInt = RandomNumberGenerator.getRandInt(60);
+                if (randInt % 30 == 0) {
+                    //firing = true;
+
+                    if (randInt == 30) {
+                        evade = true;
+                        evadeCounterY = y < GameMainActivity.GAME_HEIGHT / 2 ? 1 : -1;
+                        evadeCounterX = x < GameMainActivity.GAME_WIDTH / 2 ? 1 : -1;
+
+                        randInt2 = RandomNumberGenerator.getRandInt(3);
+                        switch (randInt2) {
+                            case 0:
+                                movementType = MovementType.VERTICAL;
+                                break;
+                            case 1:
+                                movementType = MovementType.HORIZONTAL;
+                                break;
+                            case 2:
+                                movementType = MovementType.BOTH;
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+
+            } else {
+                // random movements and fire
+                if (Math.abs(evadeCounterX) > 12 || Math.abs(evadeCounterY) > 12) {
+                    evade = false;
+                    evadeCounterX = 0;
+                    evadeCounterY = 0;
+
+                    if (firingCounter == 0)
+                        firing = false;
+                } else {
+                    switch (movementType) {
+                        case VERTICAL:
+                            maneuver(evadeCounterY, 0);
+                            break;
+                        case HORIZONTAL:
+                            maneuver(0, evadeCounterX);
+                            break;
+                        case BOTH:
+                            maneuver(evadeCounterY, evadeCounterX);
+                            break;
+                        default:
+                            break;
+                    }
+                    //maneuver(evadeCounter, 0);
+
+                    //evadeCounter++;
+                    evadeCounterX += evadeCounterX/Math.abs(evadeCounterX);
+                    evadeCounterY += evadeCounterY/Math.abs(evadeCounterY);
+                }
+            }
+        } else if (onScreen && !isAlive) {
+            //depart (blow up)
         }
 
-        if (x < 750 && y > 100 && !onScreen) {
+        /*if (x < 750 && y > 100 && !onScreen && isAlive) {
             onScreen = true;
-        }
+        }*/
 
         nextX = x + velX * delta;
         nextY = y + velY * delta;
 
-        //if (onScreen) {
-        if (!checkInsideLeft(nextX) && onScreen) {
+        if (!checkInsideLeft(nextX) && onScreen) {  // and alive
             x = 0;
             velX = 0;
         } else if (!checkInsideRight(nextX) && onScreen) {
@@ -103,11 +210,10 @@ public class Enemy {
             velY = 0;
         } else
             y = nextY;
-        //}
 
         updateRects();
         updateEnergy();
-        /*return*/ updateWeapon(delta, asteroids);
+        updateWeapon(delta, asteroids, player, wingman);
     }
 
     public void updateRects() {
@@ -121,18 +227,19 @@ public class Enemy {
             energy++;
     }
 
-    private void updateWeapon(float delta, ArrayList<Asteroid> asteroids) {
-        int scoreUpdate = 0;
+    private void updateWeapon(float delta, ArrayList<Asteroid> asteroids, Player player, Player wingman) {
+        //int scoreUpdate = 0;
 
         for (int i = 0; i < lasers.size(); i++) {
             Weapon w = lasers.get(i);
-            w.update(delta);
+            w.update(delta, -1);
 
             // update rects must go after the next section because yPos is changing
 
             // LASER START - needs some adjustment?
             if (energy >= weaponEnergy && firing && !w.getRender()) {
-                if ((int) w.getX() >= x + width - 1 && (int) w.getX() <= x + width + 11) {
+                //if ((int) w.getX() >= x + width - 1 && (int) w.getX() <= x + width + 11) {
+                if ((int) w.getX() <= x + 4 && (int) w.getX() > x - 8) {
                     if (Math.abs(velY) <= 70) {
                         w.setVelY(0);
                         w.setY(y + height / 2);
@@ -156,7 +263,7 @@ public class Enemy {
 
                     w.setRender(true);
                     energy -= weaponEnergy;
-                    Assets.playSound(Assets.fireID);
+                    Assets.playSound(Assets.fireID, 0);
                 }
             }
 
@@ -165,12 +272,22 @@ public class Enemy {
             else
                 w.updateRectDual();
 
-            for (int j = 0; j < asteroids.size(); j++) {
+            /*for (int j = 0; j < asteroids.size(); j++) {
                 Asteroid a = asteroids.get(j);
                 if (Rect.intersects(w.getRect(),a.getRect())) {
                     if (w.onCollide(a))
                         scoreUpdate++;
                 }
+            }*/
+
+            if (Rect.intersects(w.getRect(), player.getRect())) {
+                if (w.onCollideShip())
+                    player.onLaserHit();
+            }
+
+            if (Rect.intersects(w.getRect(), wingman.getRect())) {
+                if (w.onCollideShip())
+                    wingman.onLaserHit();
             }
         }
 
@@ -194,13 +311,10 @@ public class Enemy {
         }
     }
 
+    // basically the same, but for larger object
     public void pushBack(int dX) {
         x -= dX;
-        Assets.playSound(Assets.hitID);
-
-        /*if (x < -width / 2) {
-            isAlive = false;
-        }*/
+        Assets.playSound(Assets.hitID, 0);
 
         shield -= 5;
         if (shield < 1) {
@@ -212,11 +326,15 @@ public class Enemy {
 
     public void onLaserHit() {
         x += 1;
-        Assets.playSound(Assets.hitID);
+        Assets.playSound(Assets.hitID, 0);
 
-        shield -= 2;
-        if (shield < 1) {
-            isAlive = false;
+        if (isAlive)
+        {
+            shield -= 2;
+            if (shield < 1) {
+                isAlive = false;
+                onScreen = false;   // for now
+            }
         }
 
         updateRects();
@@ -251,15 +369,15 @@ public class Enemy {
 
     // enemey specific functions
     public void emerge() {
-        maneuver(2, -2);
+        maneuver(2, /*-*/2);
     }
 
-    public void activateEnemy() {
-        this.isAlive = true;
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
     public boolean getActive() {
-        return this.isAlive;
+        return active;
     }
 
     public float getX() {
@@ -310,12 +428,16 @@ public class Enemy {
         return dual;
     }
 
+    public void setOnScreen(boolean onScreen) {
+        this.onScreen = onScreen;
+    }
+
     public boolean isOnScreen() {
         return onScreen;
     }
 
     public void setAlive(boolean alive) {
-        this.isAlive = alive;
+        isAlive = alive;
     }
 
     public boolean isAlive() {

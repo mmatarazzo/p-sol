@@ -23,15 +23,14 @@ public class GameMainActivity extends Activity {
     private static int highScore;
 
     // resolution testing
-    //public static int gameWidth;
-    //public static int gameHeight;
+    //private int gameWidth = getResources().getDisplayMetrics().widthPixels;
+    //private int gameHeight = getResources().getDisplayMetrics().heightPixels;
+    //public static final int GAME_WIDTH = 1920;
+    //public static final int GAME_HEIGHT = 1080;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        //GAME_WIDTH = getResources().getDisplayMetrics().widthPixels;
-        //GAME_HEIGHT = getResources().getDisplayMetrics().heightPixels;
 
         prefs = getPreferences(Activity.MODE_PRIVATE);
         highScore = retrieveHighScore();
@@ -52,9 +51,11 @@ public class GameMainActivity extends Activity {
     @Override
     protected void onPause() {
         Log.d("GameMainActivity", "onPause()");
-        super.onPause();
+        //super.onPause();
+        //Assets.onPause();
+        sGame.onPause();    // try reverse order
         Assets.onPause();
-        sGame.onPause();
+        super.onPause();
     }
 
     public static void setHighScore(int highScore) {
