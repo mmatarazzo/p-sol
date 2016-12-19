@@ -27,7 +27,7 @@ public class Star {
                 color = STAR_COLORS[RandomNumberGenerator.getRandInt(STAR_COLORS.length)];
                 break;
             case 2: // spacedust
-                speed = RandomNumberGenerator.getRandIntBetween(64, 128);
+                speed = RandomNumberGenerator.getRandIntBetween(240, 720);
                 color = DUST_COLORS[RandomNumberGenerator.getRandInt(DUST_COLORS.length)];
                 break;
             default:
@@ -41,7 +41,7 @@ public class Star {
         if (x <= -4) {
             // Reset to the right
             x += (GameMainActivity.GAME_WIDTH + 4);
-            //y = RandomNumberGenerator.getRandIntBetween(4, GameMainActivity.GAME_HEIGHT - 4);
+            y = RandomNumberGenerator.getRandIntBetween(4, GameMainActivity.GAME_HEIGHT - 4);
         }
     }
 

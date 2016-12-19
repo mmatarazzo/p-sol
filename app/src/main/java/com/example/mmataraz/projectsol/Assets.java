@@ -35,42 +35,61 @@ public class Assets {
 
     // Splash screen and pause button bitmaps
     public static Bitmap welcome, begin, beginDown, options, optionsDown, pause, pauseDown;
+    public static Bitmap mapScreen, levelBracket, levelBracketDown, levelSelected;
+    public static Bitmap earthBrief, marsBrief, saturnBrief;
 
     // Planet, ship and object bitmaps
     public static Bitmap earth, mars, saturn;
+    public static Bitmap[] player, wingman, enemyFighter, capitalShip;
     public static Bitmap playerLevel, playerUpOne, playerUpTwo, playerDownOne, playerDownTwo;
     public static Bitmap wingmanLevel, wingmanUpOne, wingmanUpTwo, wingmanDownOne, wingmanDownTwo;
     public static Bitmap enemyLevel, enemyUpOne, enemyUpTwo, enemyDownOne, enemyDownTwo;
-    public static Bitmap asteroid, laserItem;
+    public static Bitmap capitalLevel, capitalUpOne, capitalUpTwo, capitalDownOne, capitalDownTwo;
+    public static Bitmap asteroid, laserItem, laserBeam, enemyLaser;
 
     // Animations
+    //public static Animation[] playerAnim, wingmanAnim, enemyFighterAnim, capitalShipAnim;
     public static Animation playerLevelAnim, playerUpOneAnim, playerUpTwoAnim, playerDownOneAnim, playerDownTwoAnim;
     public static Animation wingmanLevelAnim, wingmanUpOneAnim, wingmanUpTwoAnim, wingmanDownOneAnim, wingmanDownTwoAnim;
     public static Animation enemyLevelAnim, enemyUpOneAnim, enemyUpTwoAnim, enemyDownOneAnim, enemyDownTwoAnim;
+    public static Animation capitalLevelAnim, capitalUpOneAnim, capitalUpTwoAnim, capitalDownOneAnim, capitalDownTwoAnim;
 
     public static void loadMenuAssets() {
         // splash screen bitmaps
-        welcome = loadBitmap("welcome.png", false);
-        begin = loadBitmap("begin_button.png", true);
-        beginDown = loadBitmap("begin_button_down.png", true);
-        options = loadBitmap("options_button.png", true);
-        optionsDown = loadBitmap("options_button_down.png", true);
+        welcome = loadBitmap("backgrounds/welcome.png", false);
+        begin = loadBitmap("buttons/begin_button.png", true);
+        beginDown = loadBitmap("buttons/begin_button_down.png", true);
+        options = loadBitmap("buttons/options_button.png", true);
+        optionsDown = loadBitmap("buttons/options_button_down.png", true);
 
-        // level select bitmaps
-        earth = loadBitmap("earth-new.png", true);
-        mars = loadBitmap("mars.png", true);
-        saturn = loadBitmap("saturn.png", true);
+        // map and briefing bitmaps
+        mapScreen = loadBitmap("backgrounds/juno-conflict-map-01.png", true);
+        levelBracket = loadBitmap("buttons/level-bracket.png", true);
+        levelBracketDown = loadBitmap("buttons/level-bracket-pressed.png", true);
+        levelSelected = loadBitmap("buttons/level-selected.png", true);
+
+        // level background bitmaps
+        earthBrief = loadBitmap("backgrounds/earth-briefing-01.png", true);
+        marsBrief = loadBitmap("backgrounds/mars-briefing-01.png", true);
+        saturnBrief = loadBitmap("backgrounds/saturn-briefing-01.png", true);
     }
 
     public static void loadPlayAssets() {
+        // backdrops
+        earth = loadBitmap("backgrounds/earth-level-01.png", true);
+        mars = loadBitmap("backgrounds/mars-level-01.png", true);
+        saturn = loadBitmap("backgrounds/saturn-level-01.png", true);
+
         // pause button bitmaps
-        pause = loadBitmap("pause_button.png", true);
-        pauseDown = loadBitmap("pause_button_down.png", true);
+        pause = loadBitmap("buttons/pause_button.png", true);
+        pauseDown = loadBitmap("buttons/pause_button_down.png", true);
 
         // object bitmaps
-        asteroid = loadBitmap("asteroid-psol.png", false);
+        asteroid = loadBitmap("objects/asteroid-psol.png", false);
         // more bitmaps for future asteroid frames
-        laserItem = loadBitmap("laser-upgrade.png", true);
+        laserItem = loadBitmap("objects/laser-upgrade.png", true);
+        laserBeam = loadBitmap("objects/laserBeam-01.png", true);
+        enemyLaser = loadBitmap("objects/laserBeam-02.png", true);
 
         //earth = loadBitmap("earth-new.png", true);    // a different backdrop would go here
         //mars = loadBitmap("mars.png", true);          // a different backdrop would go here
@@ -83,6 +102,12 @@ public class Assets {
         playerDownOne = loadBitmap("knight/knight-downone.png", true);
         playerDownTwo = loadBitmap("knight/knight-downtwo.png", true);
 
+        /*player[0] = loadBitmap("knight/knight-uptwo.png", true);
+        player[1] = loadBitmap("knight/knight-upone.png", true);
+        player[2] = loadBitmap("knight/knight-level.png", true);
+        player[3] = loadBitmap("knight/knight-downone.png", true);
+        player[4] = loadBitmap("knight/knight-downtwo.png", true);*/
+
         // wingman ship bitmaps
         wingmanLevel = loadBitmap("arwing/arwing-straight.png", true);
         wingmanUpOne = loadBitmap("arwing/arwing-leftOne.png", true);
@@ -90,12 +115,37 @@ public class Assets {
         wingmanDownOne = loadBitmap("arwing/arwing-rightOne.png", true);
         wingmanDownTwo = loadBitmap("arwing/arwing-rightTwo.png", true);
 
+        /*wingman[0] = loadBitmap("arwing/arwing-leftTwo.png", true);
+        wingman[1] = loadBitmap("arwing/arwing-leftOne.png", true);
+        wingman[2] = loadBitmap("arwing/arwing-straight.png", true);
+        wingman[3] = loadBitmap("arwing/arwing-rightOne.png", true);
+        wingman[4] = loadBitmap("arwing/arwing-rightTwo.png", true);*/
+
         // enemy ship bitmaps
         enemyLevel = loadBitmap("defender/defender-level-enemy.png", true);
         enemyUpOne = loadBitmap("defender/defender-upOne-enemy.png", true);
         enemyUpTwo = loadBitmap("defender/defender-upTwo-enemy.png", true);
         enemyDownOne = loadBitmap("defender/defender-downOne-enemy.png", true);
         enemyDownTwo = loadBitmap("defender/defender-downTwo-enemy.png", true);
+
+        /*enemyFighter[0] = loadBitmap("defender/defender-upTwo-enemy.png", true);
+        enemyFighter[1] = loadBitmap("defender/defender-upOne-enemy.png", true);
+        enemyFighter[2] = loadBitmap("defender/defender-level-enemy.png", true);
+        enemyFighter[3] = loadBitmap("defender/defender-downOne-enemy.png", true);
+        enemyFighter[4] = loadBitmap("defender/defender-downTwo-enemy.png", true);*/
+
+        // capital ship bitmaps
+        capitalLevel = loadBitmap("battleStar/battleStar-lvl.png", true);
+        capitalUpOne = loadBitmap("battleStar/battleStar-up1.png", true);
+        capitalUpTwo = loadBitmap("battleStar/battleStar-up2.png", true);
+        capitalDownOne = loadBitmap("battleStar/battleStar-dn1.png", true);
+        capitalDownTwo = loadBitmap("battleStar/battleStar-dn2.png", true);
+
+        /*capitalShip[0] = loadBitmap("battleStar/battleStar-up2.png", true);
+        capitalShip[1] = loadBitmap("battleStar/battleStar-up1.png", true);
+        capitalShip[2] = loadBitmap("battleStar/battleStar-lvl.png", true);
+        capitalShip[3] = loadBitmap("battleStar/battleStar-dn1.png", true);
+        capitalShip[4] = loadBitmap("battleStar/battleStar-dn2.png", true);*/
 
         // more bitmaps for other ships, lasers, explosions etc..
 
@@ -120,6 +170,13 @@ public class Assets {
         Frame enemyDn1 = new Frame(enemyDownOne, .9f);
         Frame enemyDn2 = new Frame(enemyDownTwo, .9f);
 
+        // capital ship frames
+        Frame capitalLvl = new Frame(capitalLevel, .9f);
+        Frame capitalUp1 = new Frame(capitalUpOne, .9f);
+        Frame capitalUp2 = new Frame(capitalUpTwo, .9f);
+        Frame capitalDn1 = new Frame(capitalDownOne, .9f);
+        Frame capitalDn2 = new Frame(capitalDownTwo, .9f);
+
         // more frames for other ships, lasers, explosions etc..
 
         // player ship animations
@@ -143,6 +200,13 @@ public class Assets {
         enemyDownOneAnim = new Animation(true, enemyDn1);
         enemyDownTwoAnim = new Animation(true, enemyDn2);
 
+        // capital ship animations
+        capitalLevelAnim = new Animation(true, capitalLvl);
+        capitalUpOneAnim = new Animation(true, capitalUp1);
+        capitalUpTwoAnim = new Animation(true, capitalUp2);
+        capitalDownOneAnim = new Animation(true, capitalDn1);
+        capitalDownTwoAnim = new Animation(true, capitalDn2);
+
         // more animations for other ships, lasers, explosions etc..
     }
 
@@ -153,11 +217,21 @@ public class Assets {
         unloadBitmap(beginDown);
         unloadBitmap(options);
         unloadBitmap(optionsDown);
+
+        unloadBitmap(mapScreen);
+        unloadBitmap(levelBracket);
+        unloadBitmap(levelBracketDown);
+        unloadBitmap(levelSelected);
+
+        unloadBitmap(earthBrief);
+        unloadBitmap(marsBrief);
+        unloadBitmap(saturnBrief);
     }
 
     public static void unloadPlayAssets() {
         // unload play state assets
         unloadBitmap(welcome);  // also game over screen
+
         unloadBitmap(pause);
         unloadBitmap(pauseDown);
 
@@ -167,6 +241,7 @@ public class Assets {
 
         unloadBitmap(asteroid);
         unloadBitmap(laserItem);
+        unloadBitmap(laserBeam);
 
         unloadBitmap(playerLevel);
         unloadBitmap(playerUpOne);
@@ -185,15 +260,58 @@ public class Assets {
         unloadBitmap(enemyUpTwo);
         unloadBitmap(enemyDownOne);
         unloadBitmap(enemyDownTwo);
+
+        unloadBitmap(capitalLevel);
+        unloadBitmap(capitalUpOne);
+        unloadBitmap(capitalUpTwo);
+        unloadBitmap(capitalDownOne);
+        unloadBitmap(capitalDownTwo);
+    }
+
+    // could make this cleaner by using arrays
+    public static Animation getEnemyAnim(int type, int anim) {
+        if (type == 1) {    // cap ship
+            switch (anim) {
+                case 2:
+                    return capitalUpTwoAnim;
+                case 1:
+                    return capitalUpOneAnim;
+                case 0:
+                    return capitalLevelAnim;
+                case -1:
+                    return capitalDownOneAnim;
+                case -2:
+                    return capitalDownTwoAnim;
+                default:
+                    return capitalLevelAnim;
+            }
+        } else if (type == 0) { // fighter
+            switch (anim) {
+                case 2:
+                    return enemyUpTwoAnim;
+                case 1:
+                    return enemyUpOneAnim;
+                case 0:
+                    return enemyLevelAnim;
+                case -1:
+                    return enemyDownOneAnim;
+                case -2:
+                    return enemyDownTwoAnim;
+                default:
+                    return enemyLevelAnim;
+            }
+        }
+
+        return enemyLevelAnim;
     }
 
     public static void onResume() {
         // load sounds
-        hitID = loadSound("hit.wav");
-        fireID = loadSound("laser-03.wav");
-        destroyID = loadSound("explode.wav");
-        launchID = loadSound("launch-02.wav");
-        engineID = loadSound("engines-hum-02.wav");
+        hitID = loadSound("audio/hit.wav");
+        fireID = loadSound("audio/laser-discharge-03.wav");
+        destroyID = loadSound("audio/explode.wav");
+        //launchID = loadSound("launch-02.wav");
+        engineID = loadSound("audio/engines-hum-02.wav");
 
         // load multi-state bitmaps
         //welcome = loadBitmap("welcome.png", false);
@@ -337,7 +455,6 @@ public class Assets {
 
     public static void stopMusic() {
         if (mediaPlayer != null) {
-
             // save the position before releasing resources
             mediaPosition = mediaPlayer.getCurrentPosition();   // test
 

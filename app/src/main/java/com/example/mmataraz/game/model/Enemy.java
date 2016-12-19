@@ -17,42 +17,69 @@ import java.util.ArrayList;
 public class Enemy {
 
     private enum MovementType {VERTICAL, HORIZONTAL, BOTH}
+    private enum EnemyType {FIGHTER, CAPITAL, OBJECT}
+    private enum EmergeType {INTERCEPT, OVERTAKE, PASS}
 
     private float x, y, nextX, nextY;
     private int width, height;
     private int velX, velY, nextVelX, nextVelY;  // new
-    private int shield, energy;
+    private int shield, maxShield, energy;
     private Rect rect;
 
     private ArrayList<Weapon> lasers;
     private boolean firing, dual, isAlive, onScreen, active, evade;
     private int evadeCounterX, evadeCounterY, firingCounter;
 
-    // ship speed
-    private int maxVelY = 256;
-    private int maxVelX = 384;
+    // ship speed and mass
+    private int maxVelY /*= 256*/;
+    private int maxVelX /*= 384*/;
+    private int mass /*= 100*/;
+    private int weaponEnergy = 20;
+
+    private int randInt, randInt2, animType;
+    private MovementType movementType;
+    private EnemyType enemyType;
 
     // weapon
-    private static final int LASER_WIDTH = 8;
+    private static final int LASER_WIDTH = /*8*/ 16;
     private static final int LASER_HEIGHT = 1;
-    private static final int LASER_SPACING = 3;
-    private int weaponEnergy = 20;
+
+    private static final int LASER_SPACING = /*3*/ 2;
     private int laserTotalWidth = LASER_WIDTH * LASER_SPACING;
-    private int laserSegmentRemainder = 3 - (GameMainActivity.GAME_WIDTH % laserTotalWidth) / LASER_WIDTH;
+    private int laserSegmentRemainder = LASER_SPACING - (GameMainActivity.GAME_WIDTH % laserTotalWidth) / LASER_WIDTH;
 
-    private int mass = 100;
-
-    private int randInt, randInt2;
-    private MovementType movementType;
-
-    public Enemy(float x, float y, int width, int height) {
+    public Enemy(float x, float y, int width, int height, int type) {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
 
-        shield = 100;
+        maxVelY = 256;
+        maxVelX = 384;
+        mass = 100;
+        maxShield = 50;
+        shield = maxShield;
         energy = 800;
+
+        switch (type) {
+            case 0:
+                enemyType = EnemyType.FIGHTER;
+                break;
+            case 1:
+                enemyType = EnemyType.CAPITAL;
+                maxVelY = 80;
+                maxVelX = 120;
+                mass = 400;
+                maxShield = 200;
+                shield = maxShield;
+                break;
+            case 2:
+                enemyType = EnemyType.OBJECT;
+                break;
+            default:
+                break;
+        }
+
         rect = new Rect();
         isAlive = true;
         onScreen = false;
@@ -64,7 +91,7 @@ public class Enemy {
 
         lasers = new ArrayList<Weapon>();
         //for (int i = 0; i <= GameMainActivity.GAME_WIDTH; i += (LASER_WIDTH * 3)) {
-        for (int i = GameMainActivity.GAME_WIDTH; i >= 0; i -= (LASER_WIDTH * 3)) {
+        for (int i = GameMainActivity.GAME_WIDTH; i >= 0; i -= /*(LASER_WIDTH * 3)*/ laserTotalWidth) {
             Weapon w = new Weapon(i, y, -LASER_WIDTH, LASER_HEIGHT, laserSegmentRemainder);
             lasers.add(w);
         }
@@ -74,7 +101,33 @@ public class Enemy {
 
         randInt = 0;
         randInt2 = 0;
+        animType = 0;
         movementType = MovementType.VERTICAL;
+    }
+
+    public void setAnim(int anim) {
+        animType = anim;
+    }
+
+    public int getAnim() {
+        return animType;
+    }
+
+    public int getMaxShield() {
+        return maxShield;
+    }
+
+    public int getType() {
+        switch (enemyType) {
+            case FIGHTER:
+                return 0;
+            case CAPITAL:
+                return 1;
+            case OBJECT:
+                return 2;
+            default:
+                return -1;
+        }
     }
 
     public void update(float delta, ArrayList<Asteroid> asteroids, Player player, Player wingman) {
@@ -84,7 +137,7 @@ public class Enemy {
 
         if (!onScreen && isAlive) {
             emerge();
-            if (x < 750 && y > 100)
+            if (x > 50 && x < 750 && y > 50 && y < 350)
                 onScreen = true;
         }
         else if (onScreen && isAlive) {
@@ -127,8 +180,9 @@ public class Enemy {
                 }
 
                 randInt = RandomNumberGenerator.getRandInt(60);
-                if (randInt % 30 == 0) {
-                    //firing = true;
+                //if (randInt % 30 == 0) {
+                if (randInt % 31 == 30) {
+                    firing = true;
 
                     if (randInt == 30) {
                         evade = true;
@@ -185,10 +239,6 @@ public class Enemy {
         } else if (onScreen && !isAlive) {
             //depart (blow up)
         }
-
-        /*if (x < 750 && y > 100 && !onScreen && isAlive) {
-            onScreen = true;
-        }*/
 
         nextX = x + velX * delta;
         nextY = y + velY * delta;
@@ -272,13 +322,14 @@ public class Enemy {
             else
                 w.updateRectDual();
 
-            /*for (int j = 0; j < asteroids.size(); j++) {
+            for (int j = 0; j < asteroids.size(); j++) {
                 Asteroid a = asteroids.get(j);
                 if (Rect.intersects(w.getRect(),a.getRect())) {
-                    if (w.onCollide(a))
-                        scoreUpdate++;
+                    w.onCollide(a);
+                    //if (w.onCollide(a))
+                        //scoreUpdate++;
                 }
-            }*/
+            }
 
             if (Rect.intersects(w.getRect(), player.getRect())) {
                 if (w.onCollideShip())
@@ -300,12 +351,19 @@ public class Enemy {
 
             // some adjustment needed
             if (w.getRender()) {
-                g.setColor(Color.RED);
+                /*g.setColor(Color.RED);
                 if (!dual) {
                     g.fillOval((int) w.getX(), (int) w.getY(), w.getWidth(), w.getHeight());
                 } else {
                     g.fillOval((int) w.getX(), (int) w.getY() + 4, w.getWidth(), w.getHeight());
                     g.fillOval((int) w.getX(), (int) w.getY() - 4, w.getWidth(), w.getHeight());
+                }*/
+
+                if (!dual)
+                    g.drawImage(Assets.enemyLaser, (int) w.getX(), (int) w.getY()-height/4);
+                else {
+                    g.drawImage(Assets.enemyLaser, (int) w.getX(), (int) w.getY()-height/2);
+                    g.drawImage(Assets.enemyLaser, (int) w.getX(), (int) w.getY());
                 }
             }
         }
@@ -343,8 +401,8 @@ public class Enemy {
     // new
     public void maneuver(int dY, int dX) {
         // simple acceleration physics
-        nextVelX = velX + dX * /*2*/ 3; // try 3 for more sensitive movement?
-        nextVelY = velY + dY * /*2*/ 3;
+        nextVelX = velX + dX * (enemyType == EnemyType.CAPITAL ? 2 : 3)/*2*/ /*3*/; // try 3 for more sensitive movement?
+        nextVelY = velY + dY * (enemyType == EnemyType.CAPITAL ? 2 : 3) /*2*/ /*3*/;
 
         // should just lock at max if max is exceeded
         velX = (Math.abs(nextVelX) > maxVelX) ? (nextVelX < 0 ? -maxVelX : maxVelX) : nextVelX;
@@ -367,9 +425,10 @@ public class Enemy {
         return (checkY + height < GameMainActivity.GAME_HEIGHT);
     }
 
-    // enemey specific functions
+    // enemy specific functions
     public void emerge() {
-        maneuver(2, /*-*/2);
+        //maneuver(2, /*-*/2);
+        maneuver(y < 225 ? 2 : -2, x < 400 ? 2 : -2);   // try
     }
 
     public void setActive(boolean active) {

@@ -43,7 +43,7 @@ public class BriefingState extends State {
 
     @Override
     public void render(Painter g) {
-        g.drawImage(Assets.welcome, 0, 0);
+        //g.drawImage(Assets.welcome, 0, 0);
 
         g.setColor(Color.WHITE);
         g.setFont(Typeface.DEFAULT_BOLD, 32);
@@ -51,6 +51,8 @@ public class BriefingState extends State {
         // draw applicable text and graphics
         switch (currentLevel) {
             case EARTH:
+                g.drawImage(Assets.earthBrief, 0, 0);
+
                 g.drawString("JUNO CONFLICT --- EARTH I:", 100, 50);
                 g.setFont(Typeface.DEFAULT_BOLD, 18);
                 g.drawString("COMMANDER, WE'VE BEEN ORDERED TO REMAIN NEUTRAL IN THE JUNO CONFLICT.", 40, 100);
@@ -65,6 +67,8 @@ public class BriefingState extends State {
                 break;
 
             case MARS:
+                g.drawImage(Assets.marsBrief, 0, 0);
+
                 g.drawString("JUNO CONFLICT --- MARS I:", 100, 50);
                 g.setFont(Typeface.DEFAULT_BOLD, 18);
                 g.drawString("COMMANDER, A51 HAS BEEN TASKED TO HAUL ASS TO JUPITER AND SECURE", 40, 100);
@@ -79,6 +83,8 @@ public class BriefingState extends State {
                 break;
 
             case SATURN:
+                g.drawImage(Assets.saturnBrief, 0, 0);
+
                 g.drawString("JUNO CONFLICT --- SATURN I:", 100, 50);
                 g.setFont(Typeface.DEFAULT_BOLD, 18);
                 g.drawString("COMMANDER, THE TIME HAS COME! WE HAVE AWAITED THIS OPPORTUNITY FOR", 40, 100);

@@ -10,6 +10,8 @@ import com.example.mmataraz.projectsol.GameMainActivity;
  */
 public class Weapon {
 
+    private enum WeaponType {LASER, MISSILE}
+
     private float x, y, startX;
     private int width, height, velY, remainder;
     private Rect rect;
@@ -17,8 +19,8 @@ public class Weapon {
 
     //private static final int LASER_SPEED = /*768*/ 640;
     //private static final int LASER_SPEED = /*532*/ 896;   // 6-tuplets at 213 bpm
-    private static final int LASER_SPEED = /*1024*/ 720;    // try 960 next with wider render range and 16x2 segments
-    private static final int LASER_DISTANCE = 384;
+    private static final int LASER_SPEED = /*1024*/ 960;    // try 960 next with wider render range and 16x2 segments
+    private static final int LASER_DISTANCE = /*384*/ 320;
 
     public Weapon(float x, float y, int width, int height, int remainder) {
         this.x = x;

@@ -14,6 +14,8 @@ import java.util.ArrayList;
  */
 public class Player {
 
+    private enum PlayerType {PLAYER, WINGMAN, FRIENDLY}
+
     private float x, y, nextX, nextY;
     private int width, height;
     private int velX, velY, nextVelX, nextVelY;  // new
@@ -27,15 +29,17 @@ public class Player {
     private int maxVelY = 288; // >30 degrees of 400
     private int maxVelX = 512;
 
-    // weapon
+    // laser
     //private static final int LASER_WIDTH = 8;
     private static final int LASER_WIDTH = 16;
     private static final int LASER_HEIGHT = 1;
-    private static final int LASER_SPACING = 3;
-    private int weaponEnergy = 20;
-    private int laserTotalWidth = LASER_WIDTH * LASER_SPACING;
-    private int laserSegmentRemainder = 3 - (GameMainActivity.GAME_WIDTH % laserTotalWidth) / LASER_WIDTH;
 
+    private static final int LASER_SPACING = 2;
+    private int laserTotalWidth = LASER_WIDTH * LASER_SPACING;
+    private int laserSegmentRemainder = LASER_SPACING - (GameMainActivity.GAME_WIDTH % laserTotalWidth) / LASER_WIDTH;
+
+    // other params
+    private int weaponEnergy = 20;
     private int mass = 100;
 
     public Player(float x, float y, int width, int height) {
@@ -50,8 +54,7 @@ public class Player {
         isAlive = true;
 
         lasers = new ArrayList<Weapon>();
-        //for (int i = 0; i < GameMainActivity.GAME_WIDTH; i += (LASER_WIDTH * 2)) {
-        for (int i = 0; i <= GameMainActivity.GAME_WIDTH; i += (/*LASER_WIDTH * LASER_SPACING*/ laserTotalWidth)) {
+        for (int i = 0; i <= GameMainActivity.GAME_WIDTH; i += /*LASER_WIDTH * LASER_SPACING*/ laserTotalWidth) {
             Weapon w = new Weapon(i, y, LASER_WIDTH, LASER_HEIGHT, laserSegmentRemainder);
             lasers.add(w);
         }
@@ -110,7 +113,7 @@ public class Player {
             // LASER START - needs some adjustment?
             if (energy >= weaponEnergy && firing && !w.getRender()) {
                 //if ((int) w.getX() >= x + width - 1 && (int) w.getX() <= x + width + 11) {
-                if ((int) w.getX() >= x + width - 4 && (int) w.getX() < x + width + 8) {
+                if ((int) w.getX() >= x + width - (LASER_WIDTH/2) && (int) w.getX() < x + width + LASER_WIDTH) {
                     if (Math.abs(velY) <= 70) {
                         w.setVelY(0);
                         w.setY(y + height / 2);
@@ -171,12 +174,20 @@ public class Player {
 
             // some adjustment needed
             if (w.getRender()) {
-                g.setColor(Color.GREEN);
+
+                /*g.setColor(Color.GREEN);
                 if (!dual) {
                     g.fillOval((int) w.getX(), (int) w.getY(), w.getWidth(), w.getHeight());
                 } else {
                     g.fillOval((int) w.getX(), (int) w.getY() + 4, w.getWidth(), w.getHeight());
                     g.fillOval((int) w.getX(), (int) w.getY() - 4, w.getWidth(), w.getHeight());
+                }*/
+
+                if (!dual)
+                    g.drawImage(Assets.laserBeam, (int) w.getX(), (int) w.getY()-height/4);
+                else {
+                    g.drawImage(Assets.laserBeam, (int) w.getX(), (int) w.getY()-height/2);
+                    g.drawImage(Assets.laserBeam, (int) w.getX(), (int) w.getY());
                 }
             }
         }

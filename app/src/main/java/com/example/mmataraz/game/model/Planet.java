@@ -9,7 +9,8 @@ public class Planet {
 
     private float x, y;
     private boolean visible;
-    private int planetSpeed = -4;
+    //private int planetSpeed = -4;
+    private int planetSpeed = -2;
 
     public Planet(float x, float y) {
         this.x = x;
@@ -20,7 +21,7 @@ public class Planet {
     public void update(float delta) {
         x += planetSpeed * delta;
 
-        if (x < -GameMainActivity.GAME_WIDTH)
+        if (x < -GameMainActivity.GAME_WIDTH*2)
             visible = false;
     }
 
