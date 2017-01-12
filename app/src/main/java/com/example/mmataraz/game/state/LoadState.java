@@ -25,7 +25,6 @@ public class LoadState extends State {
 
     @Override
     public void init() {
-        //load();
     }
 
     @Override

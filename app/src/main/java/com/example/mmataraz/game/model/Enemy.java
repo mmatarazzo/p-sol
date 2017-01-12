@@ -382,9 +382,11 @@ public class Enemy {
         updateRects();
     }
 
-    public void onLaserHit() {
+    public int onLaserHit() {
+        int score = 0;
+
         x += 1;
-        Assets.playSound(Assets.hitID, 0);
+        //Assets.playSound(Assets.hitID, 0);
 
         if (isAlive)
         {
@@ -392,16 +394,23 @@ public class Enemy {
             if (shield < 1) {
                 isAlive = false;
                 onScreen = false;   // for now
+
+                if (enemyType == EnemyType.FIGHTER)
+                    score = 5;
+                else if (enemyType == EnemyType.CAPITAL)
+                    score = 10;
             }
         }
 
         updateRects();
+
+        return score;
     }
 
     // new
     public void maneuver(int dY, int dX) {
         // simple acceleration physics
-        nextVelX = velX + dX * (enemyType == EnemyType.CAPITAL ? 2 : 3)/*2*/ /*3*/; // try 3 for more sensitive movement?
+        nextVelX = velX + dX * (enemyType == EnemyType.CAPITAL ? 2 : 3) /*2*/ /*3*/; // try 3 for more sensitive movement?
         nextVelY = velY + dY * (enemyType == EnemyType.CAPITAL ? 2 : 3) /*2*/ /*3*/;
 
         // should just lock at max if max is exceeded
@@ -428,7 +437,7 @@ public class Enemy {
     // enemy specific functions
     public void emerge() {
         //maneuver(2, /*-*/2);
-        maneuver(y < 225 ? 2 : -2, x < 400 ? 2 : -2);   // try
+        maneuver(y < 225 ? 2 : -2, x < 400 ? 2 : -2);
     }
 
     public void setActive(boolean active) {

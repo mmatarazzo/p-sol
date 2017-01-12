@@ -24,8 +24,8 @@ public class BriefingState extends State {
 
     @Override
     public void init() {
-        beginLevel = new UIButton(50, 400, 50 + Assets.begin.getWidth(),
-                400 + Assets.begin.getHeight(), Assets.begin, Assets.beginDown);
+        beginLevel = new UIButton(50, 400, 50 + Assets.begin.getWidth(), 400 + Assets.begin.getHeight(),
+                Assets.begin, Assets.beginDown);
     }
 
     @Override
@@ -98,6 +98,18 @@ public class BriefingState extends State {
                 g.drawString("STOP OUR ADVANCE. GET OUT THERE AND LEAD US TO VICTORY, COMMANDER!!", 40, 260);
                 break;
 
+            case TRAINING:
+                g.drawImage(Assets.welcome, 0, 0);
+
+                g.drawString("TRAINING LEVEL:", 100, 50);
+                g.setFont(Typeface.DEFAULT_BOLD, 18);
+                g.drawString("NEED TO BRUSH UP ON YOUR SKILLS, COMMANDER?? I'D RECOMMEND IT.", 40, 100);
+                g.drawString("THE ADVERSARIES YOU WILL FACE ARE WELL TRAINED AND EXTREMELY DEADLY.", 40, 120);
+                g.drawString("FIRST WE'LL REVIEW FLIGHT CONTROLS AND WEAPONS, THEN BRUSH UP ON YOUR COMBAT SKILLS.", 40, 140);
+                g.drawString("AFTER THAT I'LL FLY YOUR WING AND WE'LL TALK WINGMAN COMMANDS.", 40, 160);
+
+                g.drawString("READY WHEN YOU ARE.", 40, 200);
+
             default:
                 break;
         }
@@ -118,12 +130,18 @@ public class BriefingState extends State {
                 beginLevel.cancel();
                 // Perform an action here!
                 Log.d("BriefingState", "Begin level!");
-                setCurrentState(new LoadState(this, new PlayState(/*PlayStateLevel.EARTH*/ currentLevel)));
+                setCurrentState(new LoadState(this, new PlayState(currentLevel)));
 
-                // If score button is active and the release was within the score button:
             } else {
                 // Cancel all actions.
                 beginLevel.cancel();
+
+                // Return to level select screen
+                if (currentLevel == PlayStateLevel.TRAINING) {
+                    setCurrentState(new MenuState());
+                } else {
+                    setCurrentState(new LevelSelectState());
+                }
             }
         }
 

@@ -159,7 +159,7 @@ public class Player {
                 if (e.getActive() && e.isOnScreen()) {    // only check the active enemy
                     if (Rect.intersects(w.getRect(), e.getRect())) {
                         if (w.onCollideShip() /*&& e.isOnScreen()*/)
-                            e.onLaserHit();
+                            scoreUpdate = e.onLaserHit();
                     }
                 }
             }
@@ -211,7 +211,7 @@ public class Player {
 
     public void onLaserHit() {
         x -= 1;
-        Assets.playSound(Assets.hitID, 0);
+        //Assets.playSound(Assets.hitID, 0);
 
         if (x < -width / 2) {
             isAlive = false;

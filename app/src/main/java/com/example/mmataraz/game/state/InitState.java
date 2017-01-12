@@ -11,22 +11,14 @@ import com.example.mmataraz.projectsol.Assets;
  */
 public class InitState extends State {
 
-    /*@Override
-    public void init() {
-        load();
-    }*/
-
     @Override
     public void init() {
         Log.v("debug", "init() called");
-        //Assets.load();
     }
 
     @Override
     public void update(float delta) {
-        //unload();
-        //setCurrentState(new PlayState());
-        setCurrentState(new LoadState(this, new MenuState()));
+        setCurrentState(new LoadState(this, /*new MenuState()*/ new TitleState()));
     }
 
     @Override

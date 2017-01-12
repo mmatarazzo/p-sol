@@ -7,32 +7,33 @@ import com.example.mmataraz.framework.util.Painter;
 import com.example.mmataraz.framework.util.UIButton;
 import com.example.mmataraz.projectsol.Assets;
 
-import java.util.logging.Level;
-
 /**
  * Created by Mike on 2/2/2015.
  */
 public class MenuState extends State {
 
     // Declare a UIButton object for each button.
-    private UIButton playButton, optionsButton;
+    private UIButton mainGameButton, trainingButton, scoreButton, optionsButton;
 
     @Override
     public void init() {
-        playButton = new UIButton(764-Assets.begin.getWidth(), 84, 764, 84+Assets.begin.getHeight(), Assets.begin,
-                Assets.beginDown);
-        optionsButton = new UIButton(764-Assets.options.getWidth(), 128, 764, 128+Assets.options.getHeight(), Assets.options,
-                Assets.optionsDown);
+        mainGameButton = new UIButton(764-Assets.mainGame.getWidth(), 96, 764, 96+Assets.mainGame.getHeight(),
+                Assets.mainGame, Assets.mainGame);
+        trainingButton = new UIButton(764-Assets.training.getWidth(), 128, 764, 128+Assets.training.getHeight(),
+                Assets.training, Assets.training);
+        scoreButton = new UIButton(764-Assets.score.getWidth(), 160, 764, 160+Assets.score.getHeight(),
+                Assets.score, Assets.score);
+        optionsButton = new UIButton(764-Assets.options.getWidth(), 192, 764, 192+Assets.options.getHeight(),
+                Assets.options, Assets.options);
     }
 
     @Override
     public void onLoad() {
-        Assets.loadMenuAssets();
+        //Assets.loadMenuAssets();
     }
 
     @Override
     public void onExit() {
-        //Assets.unloadMenuAssets();
     }
 
     @Override
@@ -43,35 +44,58 @@ public class MenuState extends State {
     @Override
     public void render(Painter g) {
         g.drawImage(Assets.welcome, 0, 0);
-        playButton.render(g);
+        mainGameButton.render(g);
+        trainingButton.render(g);
+        scoreButton.render(g);
         optionsButton.render(g);
     }
 
     @Override
     public boolean onTouch(MotionEvent e, int scaledX, int scaledY) {
         if (e.getAction() == MotionEvent.ACTION_DOWN) {
-            playButton.onTouchDown(scaledX, scaledY);
+            // Check if buttons were pressed
+            mainGameButton.onTouchDown(scaledX, scaledY);
+            trainingButton.onTouchDown(scaledX, scaledY);
+            scoreButton.onTouchDown(scaledX, scaledY);
             optionsButton.onTouchDown(scaledX, scaledY);
         }
 
         if (e.getAction() == MotionEvent.ACTION_UP) {
             // If the play button is active and the release was within the play button:
-            if (playButton.isPressed(scaledX, scaledY)) {
+            if (mainGameButton.isPressed(scaledX, scaledY)) {
                 // Button has been released.
-                playButton.cancel();
+                mainGameButton.cancel();
                 // Perform an action here!
                 Log.d("MenuState", "Play Button Pressed!");
-                setCurrentState(new LoadState(this, new LevelSelectState()));
+                //setCurrentState(new LoadState(this, new LevelSelectState()));
+                setCurrentState(new LevelSelectState());
 
-                // If score button is active and the release was within the score button:
-            } else if (optionsButton.isPressed(scaledX, scaledY)) {
-                optionsButton.cancel();
+                // Check training button
+            } else if (trainingButton.isPressed(scaledX, scaledY)) {
+                trainingButton.cancel();
+                setCurrentState(new BriefingState(PlayStateLevel.TRAINING));
+                //setCurrentState(new LoadState(this, new PlayState()));
+
+                // Check score button
+            } else if (scoreButton.isPressed(scaledX, scaledY)) {
+                scoreButton.cancel();
                 Log.d("MenuState", "Score Button Pressed!");
                 setCurrentState(new ScoreState());
+
+                // If options button is active and the release was within the options button:
+            } else if (optionsButton.isPressed(scaledX, scaledY)) {
+                optionsButton.cancel();
+                setCurrentState(new ScoreState());  // use score again for now
+
             } else {
                 // Cancel all actions.
-                playButton.cancel();
+                mainGameButton.cancel();
+                trainingButton.cancel();
+                scoreButton.cancel();
                 optionsButton.cancel();
+
+                // Return to the title screen
+                setCurrentState(new TitleState());
             }
         }
 

@@ -57,17 +57,21 @@ public class ScoreState extends State {
     @Override
     public boolean onTouch(MotionEvent e, int scaledX, int scaledY) {
         if (e.getAction() == MotionEvent.ACTION_DOWN) {
-            if (Math.abs(scaledX - fxSliderPosX) < 20 && Math.abs(scaledY - 405) < 20)
+            if (Math.abs(scaledX - fxSliderPosX) < 20 && Math.abs(scaledY - 405) < 20) {
                 sliderTouch = true;
+            }
         } else if (e.getAction() == MotionEvent.ACTION_MOVE) {
-            if (sliderTouch)
+            if (sliderTouch) {
                 fxSliderPosX = scaledX < 50 ? 50 : (scaledX > 250 ? 250 : scaledX);
+            }
             //Log.d("FX Volume:", Integer.toString(fxSliderPosX));
+
         } else if (e.getAction() == MotionEvent.ACTION_UP) {
-            if (!sliderTouch)
+            if (!sliderTouch) {
                 setCurrentState(new MenuState());
-            else
+            } else {
                 sliderTouch = false;
+            }
         }
 
         return true;
