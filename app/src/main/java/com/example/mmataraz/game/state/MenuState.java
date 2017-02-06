@@ -13,7 +13,7 @@ import com.example.mmataraz.projectsol.Assets;
 public class MenuState extends State {
 
     // Declare a UIButton object for each button.
-    private UIButton mainGameButton, trainingButton, scoreButton, optionsButton;
+    private UIButton mainGameButton, trainingButton, scoreButton, optionsButton, creditsButton;
 
     @Override
     public void init() {
@@ -25,11 +25,13 @@ public class MenuState extends State {
                 Assets.score, Assets.score);
         optionsButton = new UIButton(764-Assets.options.getWidth(), 192, 764, 192+Assets.options.getHeight(),
                 Assets.options, Assets.options);
+        creditsButton = new UIButton(764-Assets.credits.getWidth(), 224, 764, 224+Assets.credits.getHeight(),
+                Assets.credits, Assets.credits);
     }
 
     @Override
     public void onLoad() {
-        //Assets.loadMenuAssets();
+        Assets.loadMenuAssets();
     }
 
     @Override
@@ -48,6 +50,7 @@ public class MenuState extends State {
         trainingButton.render(g);
         scoreButton.render(g);
         optionsButton.render(g);
+        creditsButton.render(g);
     }
 
     @Override
@@ -58,6 +61,7 @@ public class MenuState extends State {
             trainingButton.onTouchDown(scaledX, scaledY);
             scoreButton.onTouchDown(scaledX, scaledY);
             optionsButton.onTouchDown(scaledX, scaledY);
+            creditsButton.onTouchDown(scaledX, scaledY);
         }
 
         if (e.getAction() == MotionEvent.ACTION_UP) {
@@ -87,19 +91,28 @@ public class MenuState extends State {
                 optionsButton.cancel();
                 setCurrentState(new ScoreState());  // use score again for now
 
+            } else if (creditsButton.isPressed(scaledX, scaledY)) {
+                creditsButton.cancel();
+
             } else {
                 // Cancel all actions.
                 mainGameButton.cancel();
                 trainingButton.cancel();
                 scoreButton.cancel();
                 optionsButton.cancel();
+                creditsButton.cancel();
 
                 // Return to the title screen
-                setCurrentState(new TitleState());
+                //setCurrentState(new TitleState());
             }
         }
 
         return true;
+    }
+
+    @Override
+    public boolean onDoubleTap(MotionEvent e) {
+        return false;
     }
 
     @Override

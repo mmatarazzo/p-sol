@@ -30,6 +30,8 @@ public abstract class State {
 
     public abstract boolean onTouch(MotionEvent e, int scaledX, int scaledY);
 
+    public abstract boolean onDoubleTap(MotionEvent e);
+
     public abstract void onPause();
 
     public abstract void onResume();

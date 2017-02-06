@@ -4,7 +4,9 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Rect;
+import android.support.v4.view.GestureDetectorCompat;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -30,8 +32,9 @@ public class GameView extends SurfaceView implements Runnable {
     private volatile State currentState;
 
     private InputHandler inputHandler;
+    //private GestureDetectorCompat gestureDetectorCompat;
 
-    public GameView(Context context, int gameWidth, int gameHeight) {
+    public GameView(final Context context, int gameWidth, int gameHeight) {
         super(context);
         gameImage = Bitmap.createBitmap(gameWidth, gameHeight, Bitmap.Config.RGB_565);
         gameImageSrc = new Rect(0, 0, gameImage.getWidth(), gameImage.getHeight());
@@ -44,7 +47,7 @@ public class GameView extends SurfaceView implements Runnable {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
                 Log.d("GameView", "Surface Created");
-                initInput();
+                initInput(context);
                 if (currentState == null) {
                     setCurrentState(new InitState());
                 }
@@ -75,11 +78,15 @@ public class GameView extends SurfaceView implements Runnable {
         inputHandler.setCurrentState(currentState);
     }
 
-    private void initInput() {
+    private void initInput(Context context) {
         if (inputHandler == null) {
-            inputHandler = new InputHandler();
+            inputHandler = new InputHandler(context);
         }
+//        if (gestureDetectorCompat == null) {
+//            gestureDetectorCompat = new GestureDetectorCompat(context, inputHandler);
+//        }
         setOnTouchListener(inputHandler);
+        //gestureDetectorCompat.setOnDoubleTapListener(inputHandler);
     }
 
     private void initGame() {

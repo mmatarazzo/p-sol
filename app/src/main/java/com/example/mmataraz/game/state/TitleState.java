@@ -39,6 +39,7 @@ public class TitleState extends State {
         creditsButton.render(g);
     }
 
+    @Override
     public boolean onTouch(MotionEvent e, int scaledX, int scaledY) {
         if (e.getAction() == MotionEvent.ACTION_DOWN) {
             // Check if buttons were pressed
@@ -68,6 +69,11 @@ public class TitleState extends State {
         }
 
         return true;
+    }
+
+    @Override
+    public boolean onDoubleTap(MotionEvent e) {
+        return false;
     }
 
     public void onPause() {

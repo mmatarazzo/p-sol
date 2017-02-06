@@ -17,8 +17,8 @@ import java.util.ArrayList;
 public class Enemy {
 
     private enum MovementType {VERTICAL, HORIZONTAL, BOTH}
-    private enum EnemyType {FIGHTER, CAPITAL, OBJECT}
-    private enum EmergeType {INTERCEPT, OVERTAKE, PASS}
+    public enum EnemyType {FIGHTER, CAPITAL, OBJECT}
+    //private enum EmergeType {INTERCEPT, OVERTAKE, PASS}
 
     private float x, y, nextX, nextY;
     private int width, height;
@@ -48,7 +48,7 @@ public class Enemy {
     private int laserTotalWidth = LASER_WIDTH * LASER_SPACING;
     private int laserSegmentRemainder = LASER_SPACING - (GameMainActivity.GAME_WIDTH % laserTotalWidth) / LASER_WIDTH;
 
-    public Enemy(float x, float y, int width, int height, int type) {
+    public Enemy(float x, float y, int width, int height, EnemyType type) {
         this.x = x;
         this.y = y;
         this.width = width;
@@ -61,20 +61,22 @@ public class Enemy {
         shield = maxShield;
         energy = 800;
 
+        enemyType = type;
+
         switch (type) {
-            case 0:
-                enemyType = EnemyType.FIGHTER;
+            case FIGHTER:
+                //enemyType = type;
                 break;
-            case 1:
-                enemyType = EnemyType.CAPITAL;
+            case CAPITAL:
+                //enemyType = type;
                 maxVelY = 80;
                 maxVelX = 120;
                 mass = 400;
                 maxShield = 200;
                 shield = maxShield;
                 break;
-            case 2:
-                enemyType = EnemyType.OBJECT;
+            case OBJECT:
+                //enemyType = type;
                 break;
             default:
                 break;
@@ -117,8 +119,10 @@ public class Enemy {
         return maxShield;
     }
 
-    public int getType() {
-        switch (enemyType) {
+    public EnemyType getType() {
+        return enemyType;
+
+        /*switch (enemyType) {
             case FIGHTER:
                 return 0;
             case CAPITAL:
@@ -127,7 +131,7 @@ public class Enemy {
                 return 2;
             default:
                 return -1;
-        }
+        }*/
     }
 
     public void update(float delta, ArrayList<Asteroid> asteroids, Player player, Player wingman) {
@@ -524,6 +528,10 @@ public class Enemy {
     public void setVelY(float velY) {
         this.velY = (int) velY;
         this.velY = (Math.abs(this.velY) > maxVelY) ? (this.velY < 0 ? -maxVelY : maxVelY) : this.velY;
+    }
+
+    public void setMovementType(MovementType movementType) {
+        this.movementType = movementType;
     }
 
 }

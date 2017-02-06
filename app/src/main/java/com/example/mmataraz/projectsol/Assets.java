@@ -14,6 +14,7 @@ import android.os.Build;
 
 import com.example.mmataraz.framework.animation.Animation;
 import com.example.mmataraz.framework.animation.Frame;
+import com.example.mmataraz.game.model.Enemy;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -88,7 +89,8 @@ public class Assets {
 
     public static void loadPlayAssets() {
         // Backdrops
-        earth = loadBitmap("backgrounds/earth-level-01.png", true);
+        //earth = loadBitmap("backgrounds/earth-level-01.png", true);
+        earth = loadBitmap("backgrounds/earth_hd.png", true);
         mars = loadBitmap("backgrounds/mars-level-01.png", true);
         saturn = loadBitmap("backgrounds/saturn-level-01.png", true);
 
@@ -276,8 +278,8 @@ public class Assets {
     }
 
     // Could make this cleaner by using arrays
-    public static Animation getEnemyAnim(int type, int anim) {
-        if (type == 1) {    // cap ship
+    public static Animation getEnemyAnim(Enemy.EnemyType type, int anim) {
+        if (type == Enemy.EnemyType.CAPITAL) {    // cap ship
             switch (anim) {
                 case 2:
                     return capitalUpTwoAnim;
@@ -292,7 +294,7 @@ public class Assets {
                 default:
                     return capitalLevelAnim;
             }
-        } else if (type == 0) { // fighter
+        } else if (type == Enemy.EnemyType.FIGHTER) { // fighter
             switch (anim) {
                 case 2:
                     return enemyUpTwoAnim;
@@ -339,7 +341,7 @@ public class Assets {
 
         Options options = new Options();
         if (transparency) {
-            options.inPreferredConfig = /*Config.ARGB_8888*/ Config.ARGB_4444;
+            options.inPreferredConfig = Config.ARGB_8888 /*Config.ARGB_4444*/;
         } else {
             options.inPreferredConfig = Config.RGB_565;
         }

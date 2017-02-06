@@ -78,6 +78,11 @@ public class ScoreState extends State {
     }
 
     @Override
+    public boolean onDoubleTap(MotionEvent e) {
+        return false;
+    }
+
+    @Override
     public void onPause() {
 
     }

@@ -18,7 +18,7 @@ public class InitState extends State {
 
     @Override
     public void update(float delta) {
-        setCurrentState(new LoadState(this, /*new MenuState()*/ new TitleState()));
+        setCurrentState(new LoadState(this, new MenuState() /*new TitleState()*/));
     }
 
     @Override
@@ -30,6 +30,12 @@ public class InitState extends State {
     public boolean onTouch(MotionEvent e, int scaledX, int scaledY) {
         return false;
     }
+
+    @Override
+    public boolean onDoubleTap(MotionEvent e) {
+        return false;
+    }
+
 
     @Override
     public void onPause() {

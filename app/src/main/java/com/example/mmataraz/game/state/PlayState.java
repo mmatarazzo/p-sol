@@ -19,7 +19,6 @@ import com.example.mmataraz.projectsol.Assets;
 import com.example.mmataraz.projectsol.GameMainActivity;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Mike on 2/16/2015.
@@ -32,6 +31,7 @@ public class PlayState extends State {
     private Player player, wingman;
     private ArrayList<Enemy> currentEnemyGroup;
     private ArrayList<ArrayList<Enemy>> enemyForces;
+    private Rect playerWingmanRect;
 
     // Dialogue
     private ArrayList<String> dialogue;
@@ -56,11 +56,17 @@ public class PlayState extends State {
     // Player properties
     private static final int PLAYER_WIDTH = 32;
     private static final int PLAYER_HEIGHT = 32;
+    private static int rectWidth, rectHeight;
     private int playerScore = 0;
 
     // Enemy properties
     private int activeEnemyGroup = 0;
     private int deactiveCount = 0;
+    private static final int ENEMY_WIDTH = 32;
+    private static final int ENEMY_HEIGHT = 32;
+    //private static final int CAPITAL_WIDTH_HEIGHT = 96;
+    private static final int CAPITAL_WIDTH = 96;
+    private static final int CAPITAL_HEIGHT = 96;
 
     // Touch location
     private float recentTouchY;
@@ -72,14 +78,15 @@ public class PlayState extends State {
     private String pausedString = "Game paused. Tap to resume.";
 
     // Other current items
-    private Animation playerCurrentAnim, wingmanCurrentAnim, enemyCurrentAnim;
+    private Animation playerCurrentAnim, wingmanCurrentAnim;
+    //private Animation enemyCurrentAnim;
     private Bitmap planetImage;
     private String musicString;
     private PlayStateLevel currentLevel;
     private int timer = 0;
 
     // Sound stream IDs
-    private static int launchStreamID;
+    //private static int launchStreamID;
     private static int engineStreamID;
 
     // Change to UI buttons
@@ -99,6 +106,7 @@ public class PlayState extends State {
             case EARTH:
                 planetImage = Assets.earth;
                 musicString = "audio/earth-projsol-27.wav";
+
                 dialogue.add("Gaia 2 standing by.. here we go!");
                 dialogue.add("It looks like we're up against one of their smaller interdiction groups.");
                 dialogue.add("I'm not sure why they're trying to stop us, but too bad for them.");
@@ -111,11 +119,13 @@ public class PlayState extends State {
                 dialogue.add("Watch that blast!");
                 dialogue.add("Those cap ships are weak..");
                 dialogue.add("Damn, more of the 4th.  Go get em!");
+
                 break;
 
             case MARS:
                 planetImage = Assets.mars;
                 musicString = "audio/mars-projsol-08.wav";
+
                 dialogue.add("Hey Skip, Ares 3 on your wing today.");
                 dialogue.add("Dude, I am dying to burn some pompous ass Saturnians.");
                 dialogue.add("Just hiding in the belt like little bitches.");
@@ -128,11 +138,13 @@ public class PlayState extends State {
                 dialogue.add("Stay clear!");
                 dialogue.add("Not so much better than ours.");
                 dialogue.add("Another bunch of pussies, Skip.");
+
                 break;
 
             case SATURN:
                 planetImage = Assets.saturn;
                 musicString = "audio/saturn-projsol-04.wav";
+
                 dialogue.add("Cronus 2, reporting in.  This is our finest hour, Commander!");
                 dialogue.add("So these Jovian fools think they can stop us?");
                 dialogue.add("Well, I suppose a little target practice is in order before we take on the Martians.");
@@ -145,11 +157,13 @@ public class PlayState extends State {
                 dialogue.add("Don't get caught in that shockwave!");
                 dialogue.add("Bigger, but not much stronger.");
                 dialogue.add("Well they don't give up, I'll give 'em that much.");
+
                 break;
 
-            default:
+            default:    // need to add training level
                 planetImage = Assets.earth;
                 musicString = "audio/earth-projsol-27.wav";
+
                 dialogue.add("Terra 2 standing by.. here we go!");
                 dialogue.add("It looks like we're up against one of their smaller interdiction groups.");
                 dialogue.add("Not sure why they're trying to stop us, but too bad for them.");
@@ -162,6 +176,7 @@ public class PlayState extends State {
                 dialogue.add("Watch that blast!");
                 dialogue.add("Weak cap ships.  Those cores suck.");
                 dialogue.add("Damn, more of the 4th.  Go get it!");
+
                 break;
         }
 
@@ -170,6 +185,7 @@ public class PlayState extends State {
         Assets.loadMusic(musicString, true);
         Assets.resumeMusic();
 
+        // Play launch & engine sound
         //launchStreamID = Assets.playSound(Assets.launchID, 0);
         engineStreamID = Assets.playSound(Assets.engineID, -1);
 
@@ -185,47 +201,65 @@ public class PlayState extends State {
         dualLaser = new Item((float) GameMainActivity.GAME_WIDTH, (float) GameMainActivity.GAME_HEIGHT,
                 ITEM_WIDTH, ITEM_HEIGHT);
 
-        // Init player
+        // Init player and wingman
         player = new Player(256, 128, PLAYER_WIDTH, PLAYER_HEIGHT);
         wingman = new Player(192, 192, PLAYER_WIDTH, PLAYER_HEIGHT);
+        playerWingmanRect = new Rect((int)wingman.getX(), (int)player.getY(),
+                (int)(player.getX()+PLAYER_WIDTH), (int)(wingman.getY()+PLAYER_HEIGHT));
+        rectWidth = playerWingmanRect.right - playerWingmanRect.left;
+        rectHeight = playerWingmanRect.bottom - playerWingmanRect.top;
 
         // Initialize enemy forces
         currentEnemyGroup = new ArrayList<Enemy>();
         enemyForces = new ArrayList<ArrayList<Enemy>>();
         ArrayList<Enemy> fighterGroup1 = new ArrayList<Enemy>();
-        Enemy fighter1 = new Enemy(-100, 0, PLAYER_WIDTH, PLAYER_HEIGHT, 0);
-        Enemy fighter2 = new Enemy(0, -100, PLAYER_WIDTH, PLAYER_HEIGHT, 0);
+        Enemy fighter1 = new Enemy(-100, 0, ENEMY_WIDTH, ENEMY_HEIGHT, Enemy.EnemyType.FIGHTER);
+        Enemy fighter2 = new Enemy(0, -100, ENEMY_WIDTH, ENEMY_HEIGHT, Enemy.EnemyType.FIGHTER);
         fighterGroup1.add(fighter1);
         fighterGroup1.add(fighter2);
 
         ArrayList<Enemy> fighterGroup2 = new ArrayList<Enemy>();
-        Enemy fighter3 = new Enemy(800, 550, PLAYER_WIDTH, PLAYER_HEIGHT, 0);
-        Enemy fighter4 = new Enemy(900, 450, PLAYER_WIDTH, PLAYER_HEIGHT, 0);
+        Enemy fighter3 = new Enemy(800, 550, ENEMY_WIDTH, ENEMY_HEIGHT, Enemy.EnemyType.FIGHTER);
+        Enemy fighter4 = new Enemy(900, 450, ENEMY_WIDTH, ENEMY_HEIGHT, Enemy.EnemyType.FIGHTER);
         fighterGroup2.add(fighter3);
         fighterGroup2.add(fighter4);
 
         ArrayList<Enemy> capitalGroup1 = new ArrayList<Enemy>();
-        Enemy capital1 = new Enemy(400, 550, 96, 96, 1);
-        Enemy capital2 = new Enemy(400, -100, 96, 96, 1);
+        Enemy capital1 = new Enemy(400, 550, CAPITAL_WIDTH, CAPITAL_HEIGHT, Enemy.EnemyType.CAPITAL);
+        Enemy capital2 = new Enemy(400, -100, CAPITAL_WIDTH, CAPITAL_HEIGHT, Enemy.EnemyType.CAPITAL);
         capitalGroup1.add(capital1);
         capitalGroup1.add(capital2);
 
         ArrayList<Enemy> mixedGroup1 = new ArrayList<>();
-        Enemy fighter5 = new Enemy(800, 550, PLAYER_WIDTH, PLAYER_HEIGHT, 0);
-        Enemy fighter6 = new Enemy(900, 450, PLAYER_WIDTH, PLAYER_HEIGHT, 0);
-        Enemy fighter7 = new Enemy(-100, 0, PLAYER_WIDTH, PLAYER_HEIGHT, 0);
-        Enemy fighter8 = new Enemy(0, -100, PLAYER_WIDTH, PLAYER_HEIGHT, 0);
-        Enemy capital3 = new Enemy(400, 550, 96, 96, 1);
+        Enemy fighter5 = new Enemy(800, 550, ENEMY_WIDTH, ENEMY_HEIGHT, Enemy.EnemyType.FIGHTER);
+        Enemy fighter6 = new Enemy(900, 450, ENEMY_WIDTH, ENEMY_HEIGHT, Enemy.EnemyType.FIGHTER);
+        Enemy fighter7 = new Enemy(-100, 0, ENEMY_WIDTH, ENEMY_HEIGHT, Enemy.EnemyType.FIGHTER);
+        Enemy fighter8 = new Enemy(0, -100, ENEMY_WIDTH, ENEMY_HEIGHT, Enemy.EnemyType.FIGHTER);
+        Enemy capital3 = new Enemy(400, 550, CAPITAL_WIDTH, CAPITAL_HEIGHT, Enemy.EnemyType.CAPITAL);
         mixedGroup1.add(fighter5);
         mixedGroup1.add(fighter6);
         mixedGroup1.add(fighter7);
         mixedGroup1.add(fighter8);
         mixedGroup1.add(capital3);
 
+        ArrayList<Enemy> fighterSquadron1 = new ArrayList<>();
+        for (int i = 0; i < 8; i++) {
+            Enemy f = new Enemy(50*(i+1), -50*(i+1), ENEMY_WIDTH, ENEMY_HEIGHT, Enemy.EnemyType.FIGHTER);
+            fighterSquadron1.add(f);
+        }
+
+        ArrayList<Enemy> capitalGroup2 = new ArrayList<>();
+        for (int i = 0; i < 4; i++) {
+            Enemy c = new Enemy(800 + i*50, 500 - i*50, CAPITAL_WIDTH, CAPITAL_HEIGHT, Enemy.EnemyType.CAPITAL);
+            capitalGroup2.add(c);
+        }
+
         enemyForces.add(fighterGroup1);
         enemyForces.add(fighterGroup2);
         enemyForces.add(capitalGroup1);
         enemyForces.add(mixedGroup1);
+        enemyForces.add(fighterSquadron1);
+        enemyForces.add(capitalGroup2);
 
         // Init chatter
         currentChatter = "";
@@ -252,7 +286,7 @@ public class PlayState extends State {
         // Init current animations
         playerCurrentAnim = Assets.playerLevelAnim;
         wingmanCurrentAnim = Assets.wingmanLevelAnim;
-        enemyCurrentAnim = Assets.enemyLevelAnim;
+        //enemyCurrentAnim = Assets.enemyLevelAnim;
 
         // Init pause/quit button
         pauseButton = new UIButton(672, 32, 720, 80, Assets.pause, Assets.pauseDown);
@@ -284,6 +318,10 @@ public class PlayState extends State {
 
         // If game is paused, do not update anything.
         if (gamePaused) {
+            if (player.getFiringStatus()) {
+                player.setFiringStatus(false);
+            }
+
             return;
         }
 
@@ -309,14 +347,17 @@ public class PlayState extends State {
             currentEnemyGroup = enemyForces.get(activeEnemyGroup);
         }
 
-        // Update game objects
+        // Update ships
+        checkFullRect(delta);
         playerScore += player.update(delta, asteroids, currentEnemyGroup);
         playerCurrentAnim.update(delta);
-        updateDualLaser(delta);
-        //updateAsteroids(delta);
 
         int test = wingman.update(delta, asteroids, currentEnemyGroup);
         wingmanCurrentAnim.update(delta);
+
+        // Update items and objects
+        updateDualLaser(delta);
+        //updateAsteroids(delta);
 
         // Increase asteroid speed when score exceeds 30
         if (playerScore > 30 && asteroidSpeed > -280) {
@@ -324,6 +365,19 @@ public class PlayState extends State {
             Asteroid.setVelX(asteroidSpeed);
         }
 
+        // Update Enemies
+        updateEnemies(delta);
+
+        // Update timer
+        if (++timer > 90000)
+            timer = 0;
+
+        if (timer >= DIALOGUE_DURATION) {
+            updateChatter();
+        }
+    }
+
+    private void updateEnemies(float delta) {
         if (activeEnemyGroup < enemyForces.size() && timer > DIALOGUE_DURATION*5) {
             for (int i = 0; i < currentEnemyGroup.size(); i++) {
                 Enemy e = currentEnemyGroup.get(i);
@@ -337,9 +391,9 @@ public class PlayState extends State {
                     e.setActive(false);
                     deactiveCount++;
 
-                    if (e.getType() == 0) {
+                    if (e.getType() == Enemy.EnemyType.FIGHTER) {
                         chatterTrack = 5;
-                    } else if (e.getType() == 1) {
+                    } else if (e.getType() == Enemy.EnemyType.CAPITAL) {
                         chatterTrack = 9;
                     }
                 }
@@ -373,14 +427,45 @@ public class PlayState extends State {
 
             deactiveCount = 0;  // needs to reset every frame
         }
+    }
 
-        // Update timer
-        if (++timer > 90000)
-            timer = 0;
+    private void checkFullRect(float delta) {
+        float nextFullX = /*playerWingmanRect.left*/ wingman.getX() + wingman.getVelX() * delta;
+        float nextFullY = /*playerWingmanRect.top*/ player.getY() + player.getVelY() * delta;
 
-        if (timer >= DIALOGUE_DURATION) {
-            updateChatter();
-        }
+        if (nextFullX < 0) {
+            wingman.setX(0);
+            wingman.setVelX(0);
+            player.setX(wingman.getX() + rectWidth - player.getWidth());
+            player.setVelX(0);
+
+        } else if (nextFullX > GameMainActivity.GAME_WIDTH - rectWidth) {
+            wingman.setX(GameMainActivity.GAME_WIDTH - rectWidth);
+            wingman.setVelX(0);
+            player.setX(wingman.getX() + rectWidth - player.getWidth());
+            player.setVelX(0);
+
+        } /*else {
+            playerWingmanRect.left = (int) nextFullX;
+            playerWingmanRect.right = playerWingmanRect.left + rectWidth;
+        }*/
+
+        if (nextFullY < 0) {
+            player.setY(0);
+            player.setVelY(0);
+            wingman.setY(player.getY() + rectHeight - wingman.getHeight());
+            wingman.setVelY(0);
+
+        } else if (nextFullY > GameMainActivity.GAME_HEIGHT - rectHeight) {
+            player.setY(GameMainActivity.GAME_HEIGHT - rectHeight);
+            player.setVelY(0);
+            wingman.setY(player.getY() + rectHeight - wingman.getHeight());
+            wingman.setVelY(0);
+
+        } /*else {
+            playerWingmanRect.top = (int) nextFullY;
+            playerWingmanRect.bottom = playerWingmanRect.top + rectHeight;
+        }*/
     }
 
     private void updateChatter() {
@@ -452,9 +537,7 @@ public class PlayState extends State {
         renderScore(g);
         renderShield(g);
         //renderEnergy(g);
-
         renderChatter(g);
-
 
         // If game is Paused, draw additional UI elements:
         if (gamePaused) {
@@ -473,7 +556,6 @@ public class PlayState extends State {
 
     private void renderChatter(Painter g) {
         //Assets.wingmanLevelAnim.render(g, 110, 420, wingman.getWidth(), wingman.getHeight());
-
         g.setColor(Color.LTGRAY);
         if (timer-timerTrack < currentChatter.length()) {
             g.drawString(currentChatter.substring(0, timer-timerTrack), 150, 430);
@@ -535,8 +617,7 @@ public class PlayState extends State {
         for (int i = 0; i < asteroids.size(); i++) {
             Asteroid a = asteroids.get(i);
             if (a.isVisible()) {
-                g.drawImage(Assets.asteroid, (int) a.getX(), (int) a.getY(),
-                        ASTEROID_WIDTH, ASTEROID_HEIGHT);
+                g.drawImage(Assets.asteroid, (int) a.getX(), (int) a.getY(), ASTEROID_WIDTH, ASTEROID_HEIGHT);
             }
         }
     }
@@ -591,13 +672,13 @@ public class PlayState extends State {
     private void renderEnemyShield(Painter g, Enemy e) {
         g.setFont(Typeface.DEFAULT_BOLD, 18);
         g.setColor(Color.RED);
-        g.fillRect((int) e.getX(), (int) e.getY()+e.getHeight()+10, e.getShield()/(e.getMaxShield()/50), 10);
+        g.fillRect((int) e.getX(), (int) e.getY() + e.getHeight() + 10, e.getShield() / (e.getMaxShield() / 50), 10);
 
         g.setColor(Color.WHITE);
-        g.fillRect((int) e.getX(), (int) e.getY()+e.getHeight()+10, 50, 1);
-        g.fillRect((int) e.getX(), (int) e.getY()+e.getHeight()+20, 50, 1);
-        g.fillRect((int) e.getX(), (int) e.getY()+e.getHeight()+10, 1, 10);
-        g.fillRect((int) e.getX()+50, (int) e.getY()+e.getHeight()+10, 1, 10);
+        g.fillRect((int) e.getX(), (int) e.getY() + e.getHeight() + 10, 50, 1);
+        g.fillRect((int) e.getX(), (int) e.getY() + e.getHeight() + 20, 50, 1);
+        g.fillRect((int) e.getX(), (int) e.getY() + e.getHeight() + 10, 1, 10);
+        g.fillRect((int) e.getX() + 50, (int) e.getY() + e.getHeight() + 10, 1, 10);
     }
 
     @Override
@@ -620,7 +701,7 @@ public class PlayState extends State {
             recentTouchX = scaledX; // new
 
             // Player is firing
-            player.setFiringStatus(true);
+            //player.setFiringStatus(true);
 
         } else if (e.getAction() == MotionEvent.ACTION_MOVE) {
             // Return if paused
@@ -724,7 +805,6 @@ public class PlayState extends State {
             } else if (pauseButton.wasHit()) {
                 // If pause button was pressed but user moved off it, return and don't pause game
                 pauseButton.cancel();
-
                 return true;
 
             } else {
@@ -732,10 +812,17 @@ public class PlayState extends State {
                 pauseButton.cancel();
             }
 
-            // Player is not firing
-            player.setFiringStatus(false);
+            // Stop firing
+            if (player.getFiringStatus())
+                player.setFiringStatus(false);
         }
 
+        return true;
+    }
+
+    @Override
+    public boolean onDoubleTap(MotionEvent e) {
+        player.setFiringStatus(true);
         return true;
     }
 

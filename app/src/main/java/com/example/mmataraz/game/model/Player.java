@@ -67,22 +67,22 @@ public class Player {
         nextX = x + velX * delta;
         nextY = y + velY * delta;
 
-        if (!checkInsideLeft(nextX)) {
+        /*if (!checkInsideLeft(nextX)) {
             x = 0;
             velX = 0;
         } else if (!checkInsideRight(nextX)) {
             x = GameMainActivity.GAME_WIDTH - width;
             velX = 0;
-        } else
+        } else*/
             x = nextX;
 
-        if (!checkInsideTop(nextY)) {
+        /*if (!checkInsideTop(nextY)) {
             y = 0;
             velY = 0;
         } else if (!checkInsideBottom(nextY)) {
             y = GameMainActivity.GAME_HEIGHT - height;
             velY = 0;
-        } else
+        } else*/
             y = nextY;
 
         updateRects();
@@ -255,6 +255,14 @@ public class Player {
         return (checkY + height < GameMainActivity.GAME_HEIGHT);
     }
 
+    public void setX(float x) {
+        this.x = x;
+    }
+
+    public void setY(float y) {
+        this.y = y;
+    }
+
     public float getX() {
         return x;
     }
@@ -269,6 +277,16 @@ public class Player {
 
     public int getHeight() {
         return height;
+    }
+
+    public void setVelX(float velX) {
+        this.velX = (int) velX;
+        this.velX = (Math.abs(this.velX) > maxVelX) ? (this.velX < 0 ? -maxVelX : maxVelX) : this.velX;
+    }
+
+    public void setVelY(float velY) {
+        this.velY = (int) velY;
+        this.velY = (Math.abs(this.velY) > maxVelY) ? (this.velY < 0 ? -maxVelY : maxVelY) : this.velY;
     }
 
     public int getVelX() {
@@ -295,6 +313,10 @@ public class Player {
         this.firing = firing;
     }
 
+    public boolean getFiringStatus() {
+        return firing;
+    }
+
     public void setDual(boolean dual) {
         this.dual = dual;
     }
@@ -315,13 +337,4 @@ public class Player {
         return mass;
     }
 
-    public void setVelX(float velX) {
-        this.velX = (int) velX;
-        this.velX = (Math.abs(this.velX) > maxVelX) ? (this.velX < 0 ? -maxVelX : maxVelX) : this.velX;
-    }
-
-    public void setVelY(float velY) {
-        this.velY = (int) velY;
-        this.velY = (Math.abs(this.velY) > maxVelY) ? (this.velY < 0 ? -maxVelY : maxVelY) : this.velY;
-    }
 }

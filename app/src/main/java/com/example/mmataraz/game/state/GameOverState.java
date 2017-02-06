@@ -61,11 +61,17 @@ public class GameOverState extends State {
     @Override
     public boolean onTouch(MotionEvent e, int scaledX, int scaledY) {
         if (e.getAction() == MotionEvent.ACTION_UP) {
-            setCurrentState(new LoadState(this, /*new MenuState()*/ new TitleState()));
+            setCurrentState(new LoadState(this, new MenuState() /*new TitleState()*/));
         }
 
         return true;
     }
+
+    @Override
+    public boolean onDoubleTap(MotionEvent e) {
+        return false;
+    }
+
 
     @Override
     public void onPause() {
