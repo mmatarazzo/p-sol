@@ -317,7 +317,7 @@ public class Assets {
     public static void onResume() {
         // Load sounds
         hitID = loadSound("audio/hit.wav");
-        fireID = loadSound("audio/laser-discharge-03.wav");
+        fireID = loadSound("audio/laser-discharge-04.wav");
         destroyID = loadSound("audio/explode.wav");
         //launchID = loadSound("launch-02.wav");
         engineID = loadSound("audio/engines-hum-02.wav");

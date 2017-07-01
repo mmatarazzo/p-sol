@@ -317,8 +317,17 @@ public class Enemy {
 
                     w.setRender(true);
                     energy -= weaponEnergy;
-                    Assets.playSound(Assets.fireID, 0);
+
+                    // play sound on every other laser fire
+                    if (w.getPlaySound()) {
+                        Assets.playSound(Assets.fireID, 0);
+                        w.setPlaySound(false);
+                    } else {
+                        w.setPlaySound(true);
+                    }
                 }
+            } else if (!firing) {
+                w.setPlaySound(true);
             }
 
             if (!dual)

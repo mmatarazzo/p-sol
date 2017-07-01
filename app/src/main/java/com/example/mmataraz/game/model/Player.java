@@ -137,8 +137,19 @@ public class Player {
 
                     w.setRender(true);
                     energy -= weaponEnergy;
-                    Assets.playSound(Assets.fireID, 0);
+
+                    // play sound on every other laser fire
+                    if (w.getPlaySound() /*Weapon.getPlaySound()*/) {
+                        Assets.playSound(Assets.fireID, 0);
+                        w.setPlaySound(false);
+                        //Weapon.setPlaySound(false);
+                    } else {
+                        w.setPlaySound(true);
+                        //Weapon.setPlaySound(true);
+                    }
                 }
+            } else if (!firing) {
+                w.setPlaySound(true);
             }
 
             if (!dual)
@@ -310,6 +321,9 @@ public class Player {
     }
 
     public void setFiringStatus(boolean firing) {
+        if (!firing) {
+            //Weapon.setPlaySound(true);
+        }
         this.firing = firing;
     }
 

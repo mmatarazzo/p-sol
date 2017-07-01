@@ -11,11 +11,12 @@ import com.example.mmataraz.projectsol.GameMainActivity;
 public class Weapon {
 
     private enum WeaponType {LASER, MISSILE}
+    //private static boolean playSound;
 
     private float x, y, startX;
     private int width, height, velY, remainder;
     private Rect rect;
-    private boolean render;
+    private boolean render, playSound;
 
     //private static final int LASER_SPEED = /*768*/ 640;
     //private static final int LASER_SPEED = /*532*/ 896;   // 6-tuplets at 213 bpm
@@ -33,6 +34,7 @@ public class Weapon {
 
         rect = new Rect((int) x, (int) y, (int) x + width, (int) y + height);
         render = false;
+        playSound = true;
     }
 
     public void update(float delta, int factor) {
@@ -50,10 +52,8 @@ public class Weapon {
         // to shorten laser travel distance, pick a constant
         // and check to see if the difference between the current
         // x and the start x exceeds the constant
-        if (factor == 1 && x >= GameMainActivity.GAME_WIDTH ||
-                factor == -1 && x <= 0) {
-            if (render)
-                render = false;
+        if (factor == 1 && x >= GameMainActivity.GAME_WIDTH || factor == -1 && x <= 0) {
+            render = false;
 
             //x -= (GameMainActivity.GAME_WIDTH + width*2);
             x = (factor == 1) ? x - (GameMainActivity.GAME_WIDTH + width*/*2*/remainder) :
@@ -142,6 +142,14 @@ public class Weapon {
 
     public boolean getRender() {
         return this.render;
+    }
+
+    public void setPlaySound(boolean play) {
+        playSound = play;
+    }
+
+    public boolean getPlaySound() {
+        return playSound;
     }
 
     public Rect getRect() {
